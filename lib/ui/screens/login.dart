@@ -1,21 +1,18 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:lost_found_mfu/components/custom_button.dart';
 import 'package:lost_found_mfu/components/custom_text_field.dart';
 
-class Signup extends StatefulWidget {
-  const Signup({super.key});
+class Login extends StatefulWidget {
+  const Login({super.key});
 
   @override
-  State<Signup> createState() => _SignupState();
+  State<Login> createState() => _LoginState();
 }
 
-class _SignupState extends State<Signup> {
+class _LoginState extends State<Login> {
   final _formKey = GlobalKey<FormState>();
-  final _nameController = TextEditingController();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
-  final _confirmPasswordController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -55,7 +52,7 @@ class _SignupState extends State<Signup> {
                     child: Column(
                       children: [
                         Text(
-                          "Sign Up",
+                          "Login",
                           style: TextStyle(
                               fontSize: 24, fontWeight: FontWeight.bold),
                           textAlign: TextAlign.center,
@@ -64,10 +61,10 @@ class _SignupState extends State<Signup> {
                         Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            Text("Don't have an account?",
+                            Text("Already have an account?",
                                 style: TextStyle(fontSize: 14)),
                             SizedBox(width: 8),
-                            Text("Login",
+                            Text("Sign Up",
                                 style: TextStyle(
                                     fontSize: 14,
                                     color: Colors.blueAccent,
@@ -80,19 +77,6 @@ class _SignupState extends State<Signup> {
                           child: Column(
                             children: [
                               CustomTextField(
-                                controller: _nameController,
-                                label: "Full Name",
-                                validator: (value) => value!.isEmpty
-                                    ? "Name can't be empty"
-                                    : null,
-                                suffixIcon: Icons.person,
-                                inputFormatters: [
-                                  FilteringTextInputFormatter.allow(
-                                      RegExp(r'[a-zA-Z]'))
-                                ],
-                              ),
-                              SizedBox(height: 20),
-                              CustomTextField(
                                   controller: _emailController,
                                   label: "Email",
                                   suffixIcon: Icons.email),
@@ -102,12 +86,7 @@ class _SignupState extends State<Signup> {
                                   label: "Password",
                                   suffixIcon: Icons.remove_red_eye),
                               SizedBox(height: 20),
-                              CustomTextField(
-                                  controller: _confirmPasswordController,
-                                  label: "Confirm Password",
-                                  suffixIcon: Icons.remove_red_eye),
-                              SizedBox(height: 30),
-                              CustomButton(text: "Sign up", onPressed: () {}),
+                              CustomButton(text: "Login", onPressed: () {}),
                               SizedBox(height: 20),
                               Row(
                                 children: [
@@ -129,7 +108,7 @@ class _SignupState extends State<Signup> {
                                 ],
                               ),
                               SizedBox(height: 20),
-                              _buildGoogleSignUpButton(),
+                              _buildGoogleLoginButton(),
                               SizedBox(height: 20),
                             ],
                           ),
@@ -146,7 +125,7 @@ class _SignupState extends State<Signup> {
     );
   }
 
-  Widget _buildGoogleSignUpButton() {
+  Widget _buildGoogleLoginButton() {
     return SizedBox(
       width: 300,
       height: 50,
@@ -164,7 +143,7 @@ class _SignupState extends State<Signup> {
           children: [
             Image.asset("assets/icons/GoogleLogo.png", width: 30, height: 30),
             SizedBox(width: 10),
-            Text("Sign Up with Google",
+            Text("Continue with Google",
                 style: TextStyle(color: Colors.black, fontSize: 16)),
           ],
         ),
