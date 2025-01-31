@@ -1,4 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:lost_found_mfu/components/utils/bottom_navigation.dart';
+import 'package:lost_found_mfu/ui/screens/chat/chat_screen.dart';
+import 'package:lost_found_mfu/ui/screens/post.dart';
+import 'package:lost_found_mfu/ui/screens/search.dart';
+import 'package:lost_found_mfu/ui/screens/setting/setting.dart';
 
 class Home extends StatefulWidget {
   const Home({super.key});
@@ -8,8 +13,59 @@ class Home extends StatefulWidget {
 }
 
 class _HomeState extends State<Home> {
+  int _selectedIndex = 0;
+
+  void _onItemTapped(int index) {
+    if (_selectedIndex != index) {
+      setState(() {
+        _selectedIndex = index;
+      });
+    }
+  }
+
+  final List<Widget> _pages = [
+    Center(child: Text("Home Screen")),
+    Search(),
+    Post(),
+    ChatScreen(),
+    Setting()
+  ];
+
   @override
   Widget build(BuildContext context) {
-    return Scaffold();
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text(
+          'Lost & Found in MFU',
+          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+        ),
+        leading: IconButton(
+          icon: const Icon(
+            Icons.notifications_active,
+            color: Colors.red,
+          ),
+          onPressed: () {
+            // Handle notification action
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(content: Text('Notifications coming soon!')),
+            );
+          },
+        ),
+        actions: [
+          CircleAvatar(
+            radius: 18, // Size of the circle avatar
+            backgroundImage: NetworkImage(
+              "https://thumbs.dreamstime.com/b/portrait-lego-man-minifigure-against-gray-baseplate-tambov-russian-federation-october-studio-shot-167467396.jpg",
+            ),
+          ),
+          const SizedBox(width: 10), // Add spacing from the edge
+        ],
+      ),
+      body: _pages[_selectedIndex],
+      bottomNavigationBar: BottomNavigation(
+        currentIndex: _selectedIndex,
+        onTap: _onItemTapped,
+      ),
+    );
   }
 }
