@@ -33,6 +33,19 @@ class _HomeState extends State<Home> {
 
   @override
   Widget build(BuildContext context) {
+    if (_selectedIndex == 0) {
+      _pages[0] = _homeComponents();
+    }
+    return Scaffold(
+      body: _pages[_selectedIndex],
+      bottomNavigationBar: BottomNavigation(
+        currentIndex: _selectedIndex,
+        onTap: _onItemTapped,
+      ),
+    );
+  }
+
+  Widget _homeComponents() {
     return Scaffold(
       appBar: AppBar(
         title: const Text(
@@ -60,11 +73,6 @@ class _HomeState extends State<Home> {
           ),
           const SizedBox(width: 10), // Add spacing from the edge
         ],
-      ),
-      body: _pages[_selectedIndex],
-      bottomNavigationBar: BottomNavigation(
-        currentIndex: _selectedIndex,
-        onTap: _onItemTapped,
       ),
     );
   }
