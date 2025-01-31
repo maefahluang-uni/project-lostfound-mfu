@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:lost_found_mfu/components/custom_button.dart';
 import 'package:lost_found_mfu/components/custom_text_field.dart';
+import 'package:lost_found_mfu/ui/screens/home.dart';
 
 class Login extends StatefulWidget {
   const Login({super.key});
@@ -86,7 +87,12 @@ class _LoginState extends State<Login> {
                                   label: "Password",
                                   suffixIcon: Icons.remove_red_eye),
                               SizedBox(height: 20),
-                              CustomButton(text: "Login", onPressed: () {}),
+                              CustomButton(
+                                  text: "Login",
+                                  onPressed: () => Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                          builder: (context) => Home()))),
                               SizedBox(height: 20),
                               Row(
                                 children: [

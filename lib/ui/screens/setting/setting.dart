@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:lost_found_mfu/ui/screens/about.dart';
-import 'package:lost_found_mfu/ui/screens/change_password.dart';
-import 'package:lost_found_mfu/ui/screens/terms_policy.dart';
+import 'package:lost_found_mfu/ui/screens/auth/login.dart';
+import 'package:lost_found_mfu/ui/screens/setting/about.dart';
+import 'package:lost_found_mfu/ui/screens/setting/change_password.dart';
+import 'package:lost_found_mfu/ui/screens/setting/terms_policy.dart';
 
 class Setting extends StatefulWidget {
   const Setting({super.key});
@@ -98,8 +99,11 @@ class _SettingState extends State<Setting> {
                                 borderRadius: BorderRadius.circular(10),
                               ),
                             ),
-                            onPressed: () => Navigator.of(context)
-                                .pop(true), // Use the onPressed parameter
+                            onPressed: () => Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) =>
+                                        Login())), // Use the onPressed parameter
                             child: Text("Logout",
                                 style: TextStyle(
                                     color: Colors.white, fontSize: 12)),
