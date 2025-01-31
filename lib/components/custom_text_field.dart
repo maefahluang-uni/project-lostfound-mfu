@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:lost_found_mfu/ui/theme/app_color.dart';
 
 class CustomTextField extends StatelessWidget {
   final TextEditingController controller;
@@ -8,6 +9,7 @@ class CustomTextField extends StatelessWidget {
   final TextInputType keyboardType;
   final IconData? suffixIcon;
   final List<TextInputFormatter>? inputFormatters;
+  final IconData? prefixIcon;
 
   const CustomTextField({
     super.key,
@@ -15,27 +17,46 @@ class CustomTextField extends StatelessWidget {
     required this.label,
     this.validator,
     this.keyboardType = TextInputType.text,
-    required this.suffixIcon,
+    this.suffixIcon,
+    this.prefixIcon,
     this.inputFormatters,
   });
 
   @override
   Widget build(BuildContext context) {
-    return TextFormField(
-      controller: controller,
-      keyboardType: keyboardType,
-      validator: validator,
-      inputFormatters: inputFormatters,
-      decoration: InputDecoration(
-        suffixIcon: Icon(suffixIcon),
-        labelText: label,
-        labelStyle: const TextStyle(color: Colors.grey),
-        enabledBorder: const OutlineInputBorder(
-          borderSide: BorderSide(color: Colors.grey),
-        ),
-        focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(20),
-          borderSide: const BorderSide(color: Colors.red),
+    return Container(
+      height: 48,
+      decoration: BoxDecoration(
+        color:Colors.white,
+        borderRadius: BorderRadius.circular(12),
+        boxShadow: [
+          BoxShadow(
+            color:AppColor.theme.primaryColor.withValues(alpha: 0.2),
+            blurRadius: 4,
+            spreadRadius: 2,
+            offset: const Offset(0,2)
+          )
+        ]
+      ),
+      child: TextFormField(
+        controller: controller,
+        keyboardType: keyboardType,
+        validator: validator,
+        inputFormatters: inputFormatters,
+        decoration: InputDecoration(
+          suffixIcon: Icon(suffixIcon),
+          prefixIcon: prefixIcon != null ? Icon(prefixIcon) : null,
+          prefixIconColor: AppColor.theme.hintColor,
+          labelText: label,
+          labelStyle: TextStyle(color: AppColor.theme.hintColor, fontSize: 16, fontWeight: FontWeight.bold),
+          enabledBorder: OutlineInputBorder(
+            borderSide: BorderSide(color: Colors.grey),
+            borderRadius: BorderRadius.circular(12),
+          ),
+          focusedBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(12),
+            borderSide: const BorderSide(color: Colors.red),
+          ),
         ),
       ),
     );
