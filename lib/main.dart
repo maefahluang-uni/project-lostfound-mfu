@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:lost_found_mfu/ui/screens/about.dart';
+import 'package:lost_found_mfu/ui/screens/chat/chat_screen.dart';
 import 'package:lost_found_mfu/ui/screens/home.dart';
 import 'package:lost_found_mfu/ui/screens/login.dart';
 import 'package:lost_found_mfu/ui/screens/setting.dart';
@@ -21,13 +22,14 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
       ),
-      initialRoute: '/setting',
+      initialRoute: '/chat',
       routes: {
         '/': (context) => const Home(),
         '/signup': (context) => Signup(),
         '/login': (context) => Login(),
         '/setting': (context) => Setting(),
-        '/about': (context) => About()
+        '/about': (context) => About(),
+        '/chat': (context) => ChatScreen()
       },
     );
   }
