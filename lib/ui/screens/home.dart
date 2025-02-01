@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:lost_found_mfu/components/utils/bottom_navigation.dart';
+import 'package:lost_found_mfu/components/utils/custom_tabbar.dart';
 import 'package:lost_found_mfu/ui/screens/chat/chat_screen.dart';
 import 'package:lost_found_mfu/ui/screens/post.dart';
 import 'package:lost_found_mfu/ui/screens/search.dart';
@@ -73,6 +74,9 @@ class _HomeState extends State<Home> {
           ),
           const SizedBox(width: 10), // Add spacing from the edge
         ],
+      ),
+      body: Column(
+        children: [Expanded(child: CustomTabbar())],
       ),
     );
   }
