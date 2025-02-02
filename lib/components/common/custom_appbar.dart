@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 class CustomAppbar extends StatelessWidget implements PreferredSizeWidget {
   final String appBarTitle;
   final bool hasBackArrow;
-  CustomAppbar({Key? key, required this.appBarTitle, required this.hasBackArrow}) : preferredSize = Size.fromHeight(kToolbarHeight), super(key: key);
+  CustomAppbar({super.key, required this.appBarTitle, required this.hasBackArrow}) : preferredSize = Size.fromHeight(kToolbarHeight);
 
   @override
   final Size preferredSize;

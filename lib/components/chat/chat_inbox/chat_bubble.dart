@@ -11,7 +11,7 @@ class ChatBubble extends StatelessWidget {
       case "text":
         return isSelf ? 
                 Padding(
-                  padding: const EdgeInsets.only(top: 21),
+                  padding: const EdgeInsets.only(bottom: 8),
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     crossAxisAlignment: CrossAxisAlignment.end,
@@ -34,7 +34,7 @@ class ChatBubble extends StatelessWidget {
                 )
                 : 
                 Padding(
-                  padding: const EdgeInsets.only(top: 21),
+                  padding: const EdgeInsets.only(bottom: 8),
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     crossAxisAlignment: CrossAxisAlignment.end,
@@ -57,12 +57,12 @@ class ChatBubble extends StatelessWidget {
       case "image":
         return isSelf ?
         Padding(
-          padding: const EdgeInsets.only(top: 21),
+          padding: const EdgeInsets.only(bottom: 8),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.end,
             children: [
             Text("12:39PM", style: TextStyle(fontSize: 14, color: Colors.black), textAlign: TextAlign.right,),
-            Container(
+            SizedBox(
               height:192,
               width: 227,
               child: ClipRRect(
@@ -75,12 +75,12 @@ class ChatBubble extends StatelessWidget {
         )
         :
         Padding(
-          padding: const EdgeInsets.only(top: 21),
+          padding: const EdgeInsets.only(bottom: 8),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.end,
             children: [
             Text("12:39PM", style: TextStyle(fontSize: 14, color: Colors.black), textAlign: TextAlign.right,),
-            Container(
+            SizedBox(
               height:192,
               width: 227,
               child: ClipRRect(
@@ -98,5 +98,5 @@ class ChatBubble extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return generateMessage();
+    return Padding(padding: EdgeInsets.only(top: 21, bottom: 13), child: generateMessage());
 }}
