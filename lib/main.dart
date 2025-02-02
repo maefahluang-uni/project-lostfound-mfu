@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:lost_found_mfu/ui/screens/notification_screen.dart';
 import 'package:lost_found_mfu/ui/screens/setting/about.dart';
 import 'package:lost_found_mfu/ui/screens/chat/chat_screen.dart';
@@ -20,6 +21,7 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       title: 'Lost & Found in MFU',
       theme: ThemeData(
+        textTheme: GoogleFonts.manropeTextTheme(),
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.white),
         useMaterial3: true,
       ),

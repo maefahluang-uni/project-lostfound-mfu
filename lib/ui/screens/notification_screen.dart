@@ -41,7 +41,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
       _pages[0] = NotificationScreen();
     }
     return Scaffold(
-      appBar: CustomAppbar(appBarTitle: "Notifications"),
+      appBar: CustomAppbar(appBarTitle: "Notifications", hasBackArrow: true,),
       body: SingleChildScrollView(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,

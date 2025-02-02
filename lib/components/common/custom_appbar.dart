@@ -2,9 +2,8 @@ import 'package:flutter/material.dart';
 
 class CustomAppbar extends StatelessWidget implements PreferredSizeWidget {
   final String appBarTitle;
-  CustomAppbar({Key? key, required this.appBarTitle})
-      : preferredSize = Size.fromHeight(kToolbarHeight),
-        super(key: key);
+  final bool hasBackArrow;
+  CustomAppbar({super.key, required this.appBarTitle, required this.hasBackArrow}) : preferredSize = Size.fromHeight(kToolbarHeight);
 
   @override
   final Size preferredSize;
@@ -20,18 +19,16 @@ class CustomAppbar extends StatelessWidget implements PreferredSizeWidget {
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            Padding(
+            hasBackArrow ?            Padding(
               padding: const EdgeInsets.only(left: 15),
               child: InkWell(
                   onTap: () => Navigator.pop(context),
                   child: Icon(Icons.arrow_back_rounded, size: 40)),
-            ),
+            )
+             : SizedBox(),
             Padding(
-              padding: const EdgeInsets.only(left: 15),
-              child: Text(
-                appBarTitle,
-                style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-              ),
+              padding: const EdgeInsets.only(left:20),
+              child: Text(appBarTitle, style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),),
             )
           ],
         ),
