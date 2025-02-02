@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:lost_found_mfu/components/utils/bottom_navigation.dart';
 import 'package:lost_found_mfu/components/utils/custom_tabbar.dart';
 import 'package:lost_found_mfu/ui/screens/chat/chat_screen.dart';
+import 'package:lost_found_mfu/ui/screens/notification_screen.dart';
 import 'package:lost_found_mfu/ui/screens/post.dart';
 import 'package:lost_found_mfu/ui/screens/search.dart';
 import 'package:lost_found_mfu/ui/screens/setting/setting.dart';
@@ -60,9 +61,8 @@ class _HomeState extends State<Home> {
           ),
           onPressed: () {
             // Handle notification action
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text('Notifications coming soon!')),
-            );
+            Navigator.push(context,
+                MaterialPageRoute(builder: (context) => NotificationScreen()));
           },
         ),
         actions: [
