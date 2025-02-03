@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:lost_found_mfu/components/custom_text_field.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:lost_found_mfu/components/common/image_upload.dart';
 import 'package:lost_found_mfu/ui/theme/app_color.dart';
 
 class ChatInput extends StatefulWidget {
-  ChatInput({super.key});
-
+  const ChatInput({super.key, required this.onImagePicked});
+  final Function(XFile?) onImagePicked; 
   @override 
   State<ChatInput> createState(){
     return _ChatInputState();
@@ -13,6 +14,7 @@ class ChatInput extends StatefulWidget {
 
 class _ChatInputState extends State<ChatInput> {
   final TextEditingController _ChatMessageInputController = TextEditingController();
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -25,7 +27,7 @@ class _ChatInputState extends State<ChatInput> {
         crossAxisAlignment: CrossAxisAlignment.center,
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Container(
+          SizedBox(
             width:300,
             child: Expanded(
               child: TextFormField(
@@ -35,7 +37,9 @@ class _ChatInputState extends State<ChatInput> {
                   contentPadding: EdgeInsets.symmetric(horizontal: 30, vertical: 15),
                   filled: true,
                   fillColor: AppColor.chatBackground,
-                  suffixIcon: IconButton(onPressed: (){}, icon: Icon(Icons.camera_alt_rounded)),
+                  suffixIcon: IconButton(onPressed: () => 
+                  showDialog(context: context, builder: (BuildContext context) => ImageUpload(onImagePicked: widget.onImagePicked)), 
+                  icon: Icon(Icons.camera_alt_rounded)),
                   hintText: "Send a message...",
                   enabledBorder: OutlineInputBorder(
                     borderSide: BorderSide.none,
@@ -59,3 +63,4 @@ class _ChatInputState extends State<ChatInput> {
     );
   }
 }
+

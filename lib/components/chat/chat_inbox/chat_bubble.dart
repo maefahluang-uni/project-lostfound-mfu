@@ -1,10 +1,14 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:lost_found_mfu/ui/theme/app_color.dart';
 
 class ChatBubble extends StatelessWidget {
-  const ChatBubble({super.key, required this.isSelf, required this.messageType});
+  const ChatBubble({super.key, required this.isSelf, required this.messageType, this.messageImage});
   final bool isSelf;
   final String messageType;
+  final XFile? messageImage;
 
   Widget generateMessage(){
     switch (messageType){
@@ -67,7 +71,7 @@ class ChatBubble extends StatelessWidget {
               width: 227,
               child: ClipRRect(
                 borderRadius: BorderRadius.only(topRight: Radius.circular(10), topLeft:Radius.circular(10), bottomLeft: Radius.circular(10)),
-                child: Image.network('https://i.ebayimg.com/images/g/RgsAAOSwtqFk1su0/s-l1200.jpg', fit: BoxFit.cover)
+                child: messageImage != null ? Image.file(File(messageImage!.path), fit: BoxFit.cover) : Image.network('https://i.ebayimg.com/images/g/RgsAAOSwtqFk1su0/s-l1200.jpg', fit: BoxFit.cover)
                 ),
             ),
             ]
@@ -85,8 +89,7 @@ class ChatBubble extends StatelessWidget {
               width: 227,
               child: ClipRRect(
                 borderRadius: BorderRadius.only(topRight: Radius.circular(10), topLeft:Radius.circular(10), bottomRight: Radius.circular(10)),
-                child: Image.network('https://i.ebayimg.com/images/g/RgsAAOSwtqFk1su0/s-l1200.jpg', fit: BoxFit.cover)
-                ),
+                child: messageImage != null ? Image.file(File(messageImage!.path), fit: BoxFit.cover) : Image.network('https://i.ebayimg.com/images/g/RgsAAOSwtqFk1su0/s-l1200.jpg', fit: BoxFit.cover)),
             ),
             ]
           ),
