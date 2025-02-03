@@ -37,7 +37,7 @@ class DetailScreen extends StatelessWidget {
                 style: const TextStyle(fontSize: 16)),
             const SizedBox(height: 20),
             SizedBox(
-              height: 250,
+              height: 300,
               child: ListView.builder(
                 scrollDirection: Axis.horizontal,
                 itemCount: item.images.length,
