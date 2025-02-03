@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:lost_found_mfu/models/post_item.dart';
+import 'package:lost_found_mfu/ui/screens/detail.dart';
 import 'package:lost_found_mfu/ui/screens/notification_screen.dart';
 import 'package:lost_found_mfu/ui/screens/profile.dart';
+import 'package:lost_found_mfu/ui/screens/search.dart';
 import 'package:lost_found_mfu/ui/screens/setting/about.dart';
 import 'package:lost_found_mfu/ui/screens/chat/chat_screen.dart';
 import 'package:lost_found_mfu/ui/screens/home.dart';
@@ -35,7 +38,8 @@ class MyApp extends StatelessWidget {
         '/about': (context) => About(),
         '/chat': (context) => ChatScreen(),
         '/notification': (context) => NotificationScreen(),
-        '/profile': (context) => Profile()
+        '/profile': (context) => Profile(),
+        '/search': (context) => Search(),
       },
     );
   }
