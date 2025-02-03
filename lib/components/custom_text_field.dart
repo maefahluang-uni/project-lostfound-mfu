@@ -11,17 +11,20 @@ class CustomTextField extends StatelessWidget {
   final List<TextInputFormatter>? inputFormatters;
   final IconData? prefixIcon;
   final double? height;
+  final Function(String)? onChanged;
 
-  const CustomTextField(
-      {super.key,
-      required this.controller,
-      required this.label,
-      this.validator,
-      this.keyboardType = TextInputType.text,
-      this.suffixIcon,
-      this.prefixIcon,
-      this.inputFormatters,
-      this.height});
+  const CustomTextField({
+    super.key,
+    required this.controller,
+    required this.label,
+    this.validator,
+    this.keyboardType = TextInputType.text,
+    this.suffixIcon,
+    this.prefixIcon,
+    this.inputFormatters,
+    this.onChanged,
+    this.height,
+  });
 
   @override
   Widget build(BuildContext context) {
