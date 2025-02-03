@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:lost_found_mfu/components/chat/chat_inbox/chat_bubble.dart';
 import 'package:lost_found_mfu/components/chat/chat_inbox/chat_input.dart';
 import 'package:lost_found_mfu/components/common/custom_appbar.dart';
 import 'package:lost_found_mfu/ui/theme/app_color.dart';
 
 class ChatInboxScreen extends StatefulWidget {
-  const ChatInboxScreen({super.key});
+  ChatInboxScreen({super.key});
 
   @override
   State<ChatInboxScreen> createState(){
@@ -15,6 +15,8 @@ class ChatInboxScreen extends StatefulWidget {
 }
 
 class _ChatInboxScreenState extends State<ChatInboxScreen> {
+    XFile? _selectedImage;
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -34,16 +36,22 @@ class _ChatInboxScreenState extends State<ChatInboxScreen> {
             children: [
               Align(alignment: Alignment.centerLeft, child: ChatBubble(messageType:"text", isSelf: false,)),
               Align(alignment: Alignment.centerRight, child:  ChatBubble(messageType:"text", isSelf: true,)),
-              Align(alignment: Alignment.centerRight, child:  ChatBubble(messageType:"image", isSelf: true,)),
+              Align(alignment: Alignment.centerRight, child:  ChatBubble(messageType:"image", isSelf: true,messageImage: _selectedImage,)),
               Align(alignment: Alignment.centerLeft, child: ChatBubble(messageType:"text", isSelf: false,)),
-              Align(alignment: Alignment.centerLeft, child: ChatBubble(messageType:"image", isSelf: false,)),
-              Align(alignment: Alignment.centerRight, child:  ChatBubble(messageType:"image", isSelf: true,)),
+              Align(alignment: Alignment.centerLeft, child: ChatBubble(messageType:"image", isSelf: false,messageImage: _selectedImage,)),
+              Align(alignment: Alignment.centerRight, child:  ChatBubble(messageType:"image", isSelf: true,messageImage: _selectedImage,)),
               Align(alignment: Alignment.centerLeft, child: ChatBubble(messageType:"text", isSelf: false,)),
-              Align(alignment: Alignment.centerLeft, child: ChatBubble(messageType:"image", isSelf: false,)),
+              Align(alignment: Alignment.centerLeft, child: ChatBubble(messageType:"image", isSelf: false,messageImage: _selectedImage,)),
             ],),
           ),
           Expanded(
-            child: ChatInput()
+            child: ChatInput(
+              onImagePicked: (XFile? selectedImage) => {
+                setState(() {
+                  _selectedImage = selectedImage;
+                })
+              },
+            )
           )
         ],
       )

@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:lost_found_mfu/components/common/all_post.dart';
-import 'package:lost_found_mfu/components/common/custom_post_component.dart';
 import 'package:lost_found_mfu/components/common/found_post.dart';
 import 'package:lost_found_mfu/components/common/lost_post.dart';
 
