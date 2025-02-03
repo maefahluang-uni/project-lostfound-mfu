@@ -79,7 +79,7 @@ class _SearchState extends State<Search> {
       body: Column(
         children: [
           Padding(
-            padding: const EdgeInsets.only(left: 25, right: 25),
+            padding: const EdgeInsets.symmetric(horizontal: 25, vertical: 16),
             child: CustomTextField(
               controller: _searchController,
               label: "Search items",
