@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:lost_found_mfu/components/common/copy_link.dart';
 import 'package:lost_found_mfu/ui/theme/app_color.dart';
 
 class CustomPostComponent extends StatefulWidget {
@@ -127,22 +128,7 @@ class _CustomPostComponentState extends State<CustomPostComponent> {
               SizedBox(
                 width: 20,
               ),
-              Row(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  Icon(
-                    Icons.copy,
-                    color: Colors.red,
-                  ),
-                  SizedBox(
-                    width: 8,
-                  ),
-                  Text(
-                    "Copy Link",
-                    style: TextStyle(color: Colors.red),
-                  )
-                ],
-              ),
+              CopyLink()
             ],
           ),
           SizedBox(
