@@ -19,7 +19,7 @@ class CustomAppbar extends StatelessWidget implements PreferredSizeWidget {
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            hasBackArrow ?            Padding(
+            hasBackArrow ? Padding(
               padding: const EdgeInsets.only(left: 15),
               child: InkWell(
                   onTap: () => Navigator.pop(context),
