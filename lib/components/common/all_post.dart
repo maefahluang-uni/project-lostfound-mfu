@@ -11,14 +11,16 @@ class AllPost extends StatefulWidget {
 class _AllPostState extends State<AllPost> {
   @override
   Widget build(BuildContext context) {
-    return SingleChildScrollView(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: const [
-          CustomPostComponent(),
-          CustomPostComponent(),
-          CustomPostComponent()
-        ],
+    return Scaffold(
+      body: SingleChildScrollView(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: const [
+            CustomPostComponent(),
+            CustomPostComponent(),
+            CustomPostComponent(),
+          ],
+        ),
       ),
     );
   }
