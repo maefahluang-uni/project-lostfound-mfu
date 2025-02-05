@@ -4,7 +4,6 @@ import 'package:lost_found_mfu/components/utils/bottom_navigation.dart';
 import 'package:lost_found_mfu/components/utils/custom_tabbar.dart';
 import 'package:lost_found_mfu/ui/screens/chat/chat_screen.dart';
 import 'package:lost_found_mfu/ui/screens/notification_screen.dart';
-import 'package:lost_found_mfu/ui/screens/post.dart';
 import 'package:lost_found_mfu/ui/screens/post/upload_post.dart';
 import 'package:lost_found_mfu/ui/screens/profile.dart';
 import 'package:lost_found_mfu/ui/screens/search.dart';
