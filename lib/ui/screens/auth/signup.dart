@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:lost_found_mfu/components/common/google_sign_up_button.dart';
 import 'package:lost_found_mfu/components/custom_button.dart';
 import 'package:lost_found_mfu/components/custom_text_field.dart';
+import 'package:lost_found_mfu/helpers/user_api_helper.dart';
+import 'package:lost_found_mfu/ui/screens/auth/login.dart';
 
 class Signup extends StatefulWidget {
   const Signup({super.key});
@@ -95,19 +98,80 @@ class _SignupState extends State<Signup> {
                               CustomTextField(
                                   controller: _emailController,
                                   label: "Email",
+                                  validator: (value) {
+                                    if (value == null || value.isEmpty) {
+                                      return "Email can't be empty";
+                                    }
+                                    final emailRegex = RegExp(
+                                        r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$');
+                                    if (!emailRegex.hasMatch(value)) {
+                                      return "Enter a valid email";
+                                    }
+                                    return null;
+                                  },
                                   suffixIcon: Icons.email),
                               SizedBox(height: 20),
                               CustomTextField(
-                                  controller: _passwordController,
-                                  label: "Password",
-                                  suffixIcon: Icons.remove_red_eye),
+                                controller: _passwordController,
+                                label: "Password",
+                                suffixIcon: Icons.remove_red_eye,
+                                validator: (value) {
+                                  if (value == null || value.isEmpty) {
+                                    return "Password can't be empty";
+                                  }
+                                  if (value.length < 6) {
+                                    return "Password must be at least 6 characters long";
+                                  }
+                                  return null;
+                                },
+                              ),
                               SizedBox(height: 20),
                               CustomTextField(
-                                  controller: _confirmPasswordController,
-                                  label: "Confirm Password",
-                                  suffixIcon: Icons.remove_red_eye),
+                                controller: _confirmPasswordController,
+                                label: "Confirm Password",
+                                suffixIcon: Icons.remove_red_eye,
+                                validator: (value) {
+                                  if (value == null || value.isEmpty) {
+                                    return "Confirm Password can't be empty";
+                                  }
+                                  if (value != _passwordController.text) {
+                                    return "Passwords do not match";
+                                  }
+                                  return null;
+                                },
+                              ),
                               SizedBox(height: 30),
-                              CustomButton(text: "Sign up", onPressed: () {}),
+                              CustomButton(
+                                  text: "Sign up",
+                                  onPressed: () async {
+                                    if (_formKey.currentState!.validate()) {
+                                      final response =
+                                          await UserApiHelper.signUp(
+                                        _nameController.text.trim(),
+                                        _emailController.text.trim(),
+                                        _passwordController.text.trim(),
+                                        _confirmPasswordController.text.trim(),
+                                      );
+
+                                      if (response.containsKey("error")) {
+                                        ScaffoldMessenger.of(context)
+                                            .showSnackBar(SnackBar(
+                                                content:
+                                                    Text(response["error"])));
+                                      } else {
+                                        ScaffoldMessenger.of(context)
+                                            .showSnackBar(SnackBar(
+                                                content:
+                                                    Text("Signup Successful")));
+                                        Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                              builder: (context) =>
+                                                  const Login()),
+                                        );
+                                      }
+                                    }
+                                  }),
                               SizedBox(height: 20),
                               Row(
                                 children: [
@@ -129,7 +193,7 @@ class _SignupState extends State<Signup> {
                                 ],
                               ),
                               SizedBox(height: 20),
-                              _buildGoogleSignUpButton(),
+                              GoogleSignUpButton(),
                               SizedBox(height: 20),
                             ],
                           ),
@@ -146,29 +210,29 @@ class _SignupState extends State<Signup> {
     );
   }
 
-  Widget _buildGoogleSignUpButton() {
-    return SizedBox(
-      width: 300,
-      height: 50,
-      child: ElevatedButton(
-        style: ElevatedButton.styleFrom(
-          backgroundColor: Colors.white,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(10),
-            side: BorderSide(color: Colors.grey),
-          ),
-        ),
-        onPressed: () {},
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Image.asset("assets/icons/GoogleLogo.png", width: 30, height: 30),
-            SizedBox(width: 10),
-            Text("Sign Up with Google",
-                style: TextStyle(color: Colors.black, fontSize: 16)),
-          ],
-        ),
-      ),
-    );
-  }
+  // Widget _buildGoogleSignUpButton() {
+  //   return SizedBox(
+  //     width: 300,
+  //     height: 50,
+  //     child: ElevatedButton(
+  //       style: ElevatedButton.styleFrom(
+  //         backgroundColor: Colors.white,
+  //         shape: RoundedRectangleBorder(
+  //           borderRadius: BorderRadius.circular(10),
+  //           side: BorderSide(color: Colors.grey),
+  //         ),
+  //       ),
+  //       onPressed: () {},
+  //       child: Row(
+  //         mainAxisAlignment: MainAxisAlignment.center,
+  //         children: [
+  //           Image.asset("assets/icons/GoogleLogo.png", width: 30, height: 30),
+  //           SizedBox(width: 10),
+  //           Text("Sign Up with Google",
+  //               style: TextStyle(color: Colors.black, fontSize: 16)),
+  //         ],
+  //       ),
+  //     ),
+  //   );
+  // }
 }

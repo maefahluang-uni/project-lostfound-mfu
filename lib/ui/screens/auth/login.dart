@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:lost_found_mfu/components/custom_button.dart';
 import 'package:lost_found_mfu/components/custom_text_field.dart';
+import 'package:lost_found_mfu/helpers/user_api_helper.dart';
 import 'package:lost_found_mfu/ui/screens/home.dart';
 
 class Login extends StatefulWidget {
@@ -78,21 +79,65 @@ class _LoginState extends State<Login> {
                           child: Column(
                             children: [
                               CustomTextField(
-                                  controller: _emailController,
-                                  label: "Email",
-                                  suffixIcon: Icons.email),
+                                controller: _emailController,
+                                label: "Email",
+                                suffixIcon: Icons.email,
+                                validator: (value) {
+                                  if (value == null || value.isEmpty) {
+                                    return "Email can't be empty";
+                                  }
+                                  final emailRegex = RegExp(
+                                      r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}\$');
+                                  if (!emailRegex.hasMatch(value)) {
+                                    return "Enter a valid email";
+                                  }
+                                  return null;
+                                },
+                              ),
                               SizedBox(height: 20),
                               CustomTextField(
-                                  controller: _passwordController,
-                                  label: "Password",
-                                  suffixIcon: Icons.remove_red_eye),
+                                controller: _passwordController,
+                                label: "Password",
+                                suffixIcon: Icons.visibility,
+                                validator: (value) {
+                                  if (value == null || value.isEmpty) {
+                                    return "Password can't be empty";
+                                  }
+                                  if (value.length < 6) {
+                                    return "Password must be at least 6 characters long";
+                                  }
+                                  return null;
+                                },
+                              ),
                               SizedBox(height: 20),
                               CustomButton(
                                   text: "Login",
-                                  onPressed: () => Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                          builder: (context) => Home()))),
+                                  onPressed: () async {
+                                    if (_formKey.currentState!.validate()) {
+                                      final response =
+                                          await UserApiHelper.signIn(
+                                              _emailController.text.trim(),
+                                              _passwordController.text.trim());
+
+                                      if (response.containsKey("error")) {
+                                        ScaffoldMessenger.of(context)
+                                            .showSnackBar(SnackBar(
+                                                content:
+                                                    Text(response["error"])));
+                                      } else {
+                                        ScaffoldMessenger.of(context)
+                                            .showSnackBar(SnackBar(
+                                                content:
+                                                    Text("Signin Successful")));
+                                      }
+
+                                      Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                              builder: (context) =>
+                                                  const Home()));
+                                    }
+                                  }),
                               SizedBox(height: 20),
                               Row(
                                 children: [
