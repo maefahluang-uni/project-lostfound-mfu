@@ -23,7 +23,6 @@ class _GoogleSignUpButtonState extends State<GoogleSignUpButton> {
     }
   }
 
-  @override
   Widget _buildGoogleSignUpButton() {
     return SizedBox(
       width: 300,
