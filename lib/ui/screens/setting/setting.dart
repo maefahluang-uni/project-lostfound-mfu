@@ -30,17 +30,15 @@ class _SettingState extends State<Setting> {
       ),
       body: Column(
         children: [
-          buildSettingRow("About", Icons.question_mark_outlined, _aboutColor,
-              () {
+          buildSettingRow("About", Icons.question_mark_outlined, () {
             Navigator.push(
                 context, MaterialPageRoute(builder: (context) => About()));
           }),
-          buildSettingRow(
-              "Terms & Policy", Icons.assignment_rounded, _termsColor, () {
+          buildSettingRow("Terms & Policy", Icons.assignment_rounded, () {
             Navigator.push(context,
                 MaterialPageRoute(builder: (context) => TermsPolicy()));
           }),
-          buildSettingRow("Change Password", Icons.lock, _passwordColor, () {
+          buildSettingRow("Change Password", Icons.lock, () {
             Navigator.push(context,
                 MaterialPageRoute(builder: (context) => ChangePassword()));
           }),
@@ -50,42 +48,37 @@ class _SettingState extends State<Setting> {
     );
   }
 
-  Widget buildSettingRow(
-      String text, IconData icon, Color color, VoidCallback onTap) {
+  Widget buildSettingRow(String text, IconData icon, VoidCallback onTap) {
     return Padding(
       padding: const EdgeInsets.all(20),
-      child: MouseRegion(
-        onEnter: (_) => setState(() => color = Colors.grey[500]!),
-        onExit: (_) => setState(() => color = Colors.grey[300]!),
-        child: InkWell(
-          onTap: onTap,
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Container(
-                padding: EdgeInsets.all(10),
-                decoration: BoxDecoration(
-                  color: color,
-                  borderRadius: BorderRadius.circular(15.0),
-                ),
-                child: Icon(icon, size: 20, color: Colors.red),
+      child: InkWell(
+        onTap: onTap,
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Container(
+              padding: EdgeInsets.all(10),
+              decoration: BoxDecoration(
+                color: Colors.grey[300],
+                borderRadius: BorderRadius.circular(15.0),
               ),
-              Expanded(
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 50),
-                  child: Text(
-                    text,
-                    style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.black),
-                    textAlign: TextAlign.left,
-                  ),
+              child: Icon(icon, size: 20, color: Colors.red),
+            ),
+            Expanded(
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 50),
+                child: Text(
+                  text,
+                  style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black),
+                  textAlign: TextAlign.left,
                 ),
               ),
-              Icon(Icons.arrow_right_alt_outlined, size: 30, color: Colors.red),
-            ],
-          ),
+            ),
+            Icon(Icons.arrow_right_alt_outlined, size: 30, color: Colors.red),
+          ],
         ),
       ),
     );
@@ -94,37 +87,33 @@ class _SettingState extends State<Setting> {
   Widget buildLogoutButton() {
     return Padding(
       padding: const EdgeInsets.all(20),
-      child: MouseRegion(
-        onEnter: (_) => setState(() => _logoutColor = Colors.grey[500]!),
-        onExit: (_) => setState(() => _logoutColor = Colors.grey[300]!),
-        child: InkWell(
-          onTap: () => _showLogoutDialog(),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Container(
-                padding: EdgeInsets.all(10),
-                decoration: BoxDecoration(
-                  color: Colors.grey[300],
-                  borderRadius: BorderRadius.circular(15.0),
-                ),
-                child: Icon(Icons.logout_sharp, size: 20, color: Colors.red),
+      child: InkWell(
+        onTap: _showLogoutDialog,
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Container(
+              padding: EdgeInsets.all(10),
+              decoration: BoxDecoration(
+                color: Colors.grey[300],
+                borderRadius: BorderRadius.circular(15.0),
               ),
-              Expanded(
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 50),
-                  child: Text(
-                    "Log out",
-                    style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.red),
-                    textAlign: TextAlign.left,
-                  ),
+              child: Icon(Icons.logout_sharp, size: 20, color: Colors.red),
+            ),
+            Expanded(
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 50),
+                child: Text(
+                  "Log out",
+                  style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.red),
+                  textAlign: TextAlign.left,
                 ),
               ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );
@@ -154,7 +143,10 @@ class _SettingState extends State<Setting> {
                 shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(10)),
               ),
-              onPressed: () => _handleLogout(),
+              onPressed: () async {
+                Navigator.of(context).pop(); // Close dialog before logout
+                _handleLogout();
+              },
               child: Text("Logout",
                   style: TextStyle(color: Colors.white, fontSize: 12)),
             ),
@@ -169,13 +161,17 @@ class _SettingState extends State<Setting> {
   }
 
   Future<void> _handleLogout() async {
-    String? token = await UserApiHelper.getToken();
-    if (token != null) {
-      await UserApiHelper.logout();
+    bool isLoggedOut = await UserApiHelper.logout();
+    if (isLoggedOut) {
       Navigator.pushReplacement(
           context, MaterialPageRoute(builder: (context) => Login()));
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Logout Successfully")),
+      );
     } else {
-      print("No token found, logout failed.");
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Logout failed. Please try again.")),
+      );
     }
   }
 }

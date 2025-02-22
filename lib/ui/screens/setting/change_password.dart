@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:lost_found_mfu/components/custom_button.dart';
 import 'package:lost_found_mfu/components/custom_text_field.dart';
+import 'package:lost_found_mfu/helpers/user_api_helper.dart';
 
 class ChangePassword extends StatefulWidget {
   const ChangePassword({super.key});
@@ -114,7 +115,45 @@ class _ChangePasswordState extends State<ChangePassword> {
                                 ),
                                 SizedBox(height: 20),
                                 CustomButton(
-                                    text: "Change Password", onPressed: () {}),
+                                    text: "Change Password",
+                                    onPressed: () async {
+                                      if (_formKey.currentState!.validate()) {
+                                        String oldPassword =
+                                            _oldPasswordContoller.text;
+                                        String newPassword =
+                                            _newPasswordContoller.text;
+                                        String confirmNewPassword =
+                                            _confirmNewPasswordContoller.text;
+
+                                        if (newPassword != confirmNewPassword) {
+                                          ScaffoldMessenger.of(context)
+                                              .showSnackBar(SnackBar(
+                                                  content: Text(
+                                                      "New passwords do not match!")));
+                                          return;
+                                        }
+
+                                        bool success =
+                                            await UserApiHelper.changePassword(
+                                                oldPassword, newPassword);
+                                        if (success) {
+                                          ScaffoldMessenger.of(context)
+                                              .showSnackBar(
+                                            SnackBar(
+                                                content: Text(
+                                                    "Password changed successfully!")),
+                                          );
+                                          Navigator.pop(context);
+                                        } else {
+                                          ScaffoldMessenger.of(context)
+                                              .showSnackBar(
+                                            SnackBar(
+                                                content: Text(
+                                                    "Failed to change password!")),
+                                          );
+                                        }
+                                      }
+                                    }),
                                 SizedBox(height: 20),
                               ],
                             ),

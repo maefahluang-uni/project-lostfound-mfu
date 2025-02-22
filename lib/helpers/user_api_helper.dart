@@ -1,10 +1,9 @@
 import 'dart:convert';
-import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
 class UserApiHelper {
-  static const String baseUrl = "";
+  static final String? baseUrl = 'http://localhost:3001/api';
 
   // Get token from shared preferences
   static Future<String?> getToken() async {
@@ -21,23 +20,25 @@ class UserApiHelper {
   }
 
   // Sign up
-  static Future<Map<String, dynamic>> signUp(String name, String email,
+  static Future<Map<String, dynamic>> signUp(String fullName, String email,
       String password, String confirmPassword) async {
     if (password != confirmPassword) {
       return {"error": "Passwords do not match"};
     }
 
-    final url = Uri.parse('$baseUrl/signup');
+    final url = Uri.parse('$baseUrl/users/signup');
 
     try {
       final response = await http.post(
         url,
         headers: _headers(),
-        body: jsonEncode({"name": name, "email": email, "password": password}),
+        body: jsonEncode(
+            {"fullName": fullName, "email": email, "password": password}),
       );
 
       final data = jsonDecode(response.body);
-      if (response.statusCode == 200) {
+      print(data);
+      if (response.statusCode == 201) {
         return data;
       } else {
         return {"error": data["message"] ?? "Signup failed, please try again"};
@@ -50,7 +51,7 @@ class UserApiHelper {
   // Sign in
   static Future<Map<String, dynamic>> signIn(
       String email, String password) async {
-    final url = Uri.parse('$baseUrl/signin');
+    final url = Uri.parse('$baseUrl/users/signin');
 
     try {
       final response = await http.post(
@@ -60,13 +61,21 @@ class UserApiHelper {
       );
 
       final data = jsonDecode(response.body);
-      if (response.statusCode == 200 && data.containsKey('token')) {
-        final prefs = await SharedPreferences.getInstance();
-        await prefs.setString('token', data['token']);
-        return data;
+
+      if (response.statusCode == 201) {
+        if (data.containsKey('token')) {
+          final prefs = await SharedPreferences.getInstance();
+          await prefs.setString('token', data['token']);
+          return {
+            'message': data['message'] ?? 'User signed in successfully',
+            'user': data['user']
+          };
+        } else {
+          return {'error': 'Token not found in response. Please try again.'};
+        }
       } else {
         return {
-          "error":
+          'error':
               data["message"] ?? "Sign-in failed, please check your credentials"
         };
       }
@@ -76,18 +85,88 @@ class UserApiHelper {
   }
 
   // Logout
-  static Future<void> logout() async {
-    final prefs = await SharedPreferences.getInstance();
-    final token = await getToken();
-    if (token == null) return;
+  static Future<bool> logout() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.remove('token');
+      return true;
+    } catch (e) {
+      return false;
+    }
+  }
 
-    final url = Uri.parse('$baseUrl/logout');
+  // Change Password
+  static Future<bool> changePassword(
+      String oldPassword, String newPassword) async {
+    String? token = await getToken();
 
     try {
-      await http.post(url, headers: _headers(token: token));
-      await prefs.remove('token');
+      final response = await http.put(Uri.parse('$baseUrl/change-password'),
+          headers: _headers(token: token),
+          body: jsonEncode(
+              {"old_password": oldPassword, "new_password": newPassword}));
+
+      if (response.statusCode == 200) {
+        return true;
+      } else {
+        print("Failed to change password: ${response.body}");
+        return false;
+      }
     } catch (e) {
-      debugPrint("Logout failed: $e");
+      print("Error changing password: $e");
+      return false;
+    }
+  }
+
+  static Future<Map<String, String>> getUserProfile() async {
+    String? token = await getToken();
+
+    try {
+      final response = await http.get(Uri.parse('$baseUrl/user-profile'),
+          headers: _headers(token: token));
+
+      if (response.statusCode == 200) {
+        Map<String, dynamic> data = jsonDecode(response.body);
+        return {
+          'name': data['name'] ?? 'Unknown',
+          'bio': data['bio'] ?? 'No bio available',
+          'profile': data['profile'] ?? 'assets/images/user.jpeg'
+        };
+      } else {
+        print("Failed to fetch profile data: ${response.body}");
+        return {};
+      }
+    } catch (e) {
+      print("Error fetching profile data: $e");
+      return {};
+    }
+  }
+
+  static Future<Map<String, String>> updateUserProfile(
+    String name,
+    String bio,
+    String profileImageUrl,
+  ) async {
+    String? token = await getToken();
+
+    try {
+      final response = await http.post(Uri.parse('$baseUrl/update-profile'),
+          headers: _headers(token: token),
+          body: json.encode({
+            'name': name,
+            'bio': bio,
+            'profile': profileImageUrl,
+          }));
+
+      if (response.statusCode == 200) {
+        return json.decode(response.body);
+      } else {
+        print('Failed to update profile: ${response.statusCode}');
+        return {};
+      }
+    } catch (e) {
+      print("Error fetching profile data: $e");
+      return {};
     }
   }
 }
