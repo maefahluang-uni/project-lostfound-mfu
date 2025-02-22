@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:lost_found_mfu/components/custom_button.dart';
 import 'package:lost_found_mfu/components/custom_text_field.dart';
 import 'package:lost_found_mfu/helpers/user_api_helper.dart';
+import 'package:lost_found_mfu/ui/screens/auth/signup.dart';
 import 'package:lost_found_mfu/ui/screens/home.dart';
 
 class Login extends StatefulWidget {
@@ -66,11 +67,19 @@ class _LoginState extends State<Login> {
                             Text("Already have an account?",
                                 style: TextStyle(fontSize: 14)),
                             SizedBox(width: 8),
-                            Text("Sign Up",
-                                style: TextStyle(
-                                    fontSize: 14,
-                                    color: Colors.blueAccent,
-                                    fontWeight: FontWeight.bold)),
+                            InkWell(
+                              onTap: () {
+                                Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (context) => Signup()));
+                              },
+                              child: Text("Sign Up",
+                                  style: TextStyle(
+                                      fontSize: 14,
+                                      color: Colors.blueAccent,
+                                      fontWeight: FontWeight.bold)),
+                            ),
                           ],
                         ),
                         SizedBox(height: 30),
@@ -86,11 +95,11 @@ class _LoginState extends State<Login> {
                                   if (value == null || value.isEmpty) {
                                     return "Email can't be empty";
                                   }
-                                  final emailRegex = RegExp(
-                                      r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}\$');
-                                  if (!emailRegex.hasMatch(value)) {
-                                    return "Enter a valid email";
-                                  }
+                                  // final emailRegex = RegExp(
+                                  //     r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}\$');
+                                  // if (!emailRegex.hasMatch(value)) {
+                                  //   return "Enter a valid email";
+                                  // }
                                   return null;
                                 },
                               ),
@@ -129,13 +138,12 @@ class _LoginState extends State<Login> {
                                             .showSnackBar(SnackBar(
                                                 content:
                                                     Text("Signin Successful")));
+                                        Navigator.push(
+                                            context,
+                                            MaterialPageRoute(
+                                                builder: (context) =>
+                                                    const Home()));
                                       }
-
-                                      Navigator.push(
-                                          context,
-                                          MaterialPageRoute(
-                                              builder: (context) =>
-                                                  const Home()));
                                     }
                                   }),
                               SizedBox(height: 20),

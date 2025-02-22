@@ -70,11 +70,19 @@ class _SignupState extends State<Signup> {
                             Text("Don't have an account?",
                                 style: TextStyle(fontSize: 14)),
                             SizedBox(width: 8),
-                            Text("Login",
-                                style: TextStyle(
-                                    fontSize: 14,
-                                    color: Colors.blueAccent,
-                                    fontWeight: FontWeight.bold)),
+                            InkWell(
+                              onTap: () {
+                                Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (context) => Login()));
+                              },
+                              child: Text("Login",
+                                  style: TextStyle(
+                                      fontSize: 14,
+                                      color: Colors.blueAccent,
+                                      fontWeight: FontWeight.bold)),
+                            ),
                           ],
                         ),
                         SizedBox(height: 30),
