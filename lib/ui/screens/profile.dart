@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:lost_found_mfu/components/common/custom_appbar.dart';
 import 'package:lost_found_mfu/components/common/profile_listing.dart';
 import 'package:lost_found_mfu/components/custom_button.dart';
+import 'package:lost_found_mfu/helpers/user_api_helper.dart';
 import 'package:lost_found_mfu/ui/screens/edit_profile.dart';
-// import 'package:lost_found_mfu/api/userapi_helper.dart';
 
 class Profile extends StatefulWidget {
   const Profile({super.key});
@@ -13,26 +13,12 @@ class Profile extends StatefulWidget {
 }
 
 class _ProfileState extends State<Profile> {
-  final _formKey = GlobalKey<FormState>();
-  late Future<Map<String, String>> userProfile;
+  late Future<Map<String, dynamic>> userProfile;
 
   @override
   void initState() {
     super.initState();
-    userProfile = _fetchUserProfile();
-    // UserApiHelper.getUserProfile();
-  }
-
-  // Mock API function to simulate a delay and return user data
-  // Have to delete after using real API
-  Future<Map<String, String>> _fetchUserProfile() async {
-    await Future.delayed(Duration(seconds: 2));
-
-    return {
-      'name': 'Unknown User',
-      'bio': 'No bio available',
-      'profile': 'assets/images/user.jpeg',
-    };
+    userProfile = UserApiHelper.getUserProfile();
   }
 
   @override
@@ -41,62 +27,68 @@ class _ProfileState extends State<Profile> {
       appBar: CustomAppbar(appBarTitle: "Profile", hasBackArrow: true),
       body: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 30),
-        child: FutureBuilder<Map<String, String>>(
+        child: FutureBuilder<Map<String, dynamic>>(
           future: userProfile,
           builder: (context, snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) {
-              return Center(child: CircularProgressIndicator());
+              return const Center(child: CircularProgressIndicator());
             }
 
             if (snapshot.hasError) {
-              return Center(child: Text("Error loading profile"));
+              return const Center(child: Text("Error loading profile"));
             }
 
-            if (!snapshot.hasData || snapshot.data!.isEmpty) {
-              return Center(child: Text("No profile data available"));
+            final userData = snapshot.data;
+            if (userData == null || userData.isEmpty) {
+              return const Center(child: Text("No profile data available"));
             }
-
-            Map<String, String> userData = snapshot.data!;
 
             return Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                CircleAvatar(
-                  radius: 80,
-                  backgroundImage: AssetImage(
-                      userData['profile'] ?? "assets/images/user.jpeg"),
+                Center(
+                  child: CircleAvatar(
+                    radius: 80,
+                    backgroundImage: AssetImage(
+                      userData['profile'] ?? "assets/images/user.jpeg",
+                    ),
+                  ),
                 ),
-                SizedBox(height: 20),
+                const SizedBox(height: 20),
                 Text(
-                  userData['name'] ?? 'Unknown User',
-                  style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                  userData['fullName'] ?? 'Unknown User',
+                  style: const TextStyle(
+                      fontSize: 24, fontWeight: FontWeight.bold),
                 ),
-                SizedBox(height: 8),
+                const SizedBox(height: 8),
                 Text(
                   userData['bio'] ?? 'No bio available',
-                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700),
+                  style: const TextStyle(
+                      fontSize: 16, fontWeight: FontWeight.w700),
                 ),
-                SizedBox(height: 20),
+                const SizedBox(height: 20),
                 CustomButton(
                   onPressed: () {
                     Navigator.push(
                       context,
-                      MaterialPageRoute(builder: (context) => EditProfile()),
+                      MaterialPageRoute(
+                          builder: (context) => const EditProfile()),
                     );
                   },
                   text: "Edit Profile",
-                  key: _formKey,
-                  width: 400,
+                  width: double.infinity,
                 ),
-                SizedBox(height: 10),
-                SingleChildScrollView(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      ProfileListing(),
-                      ProfileListing(),
-                      ProfileListing(),
-                    ],
+                const SizedBox(height: 10),
+                Expanded(
+                  child: SingleChildScrollView(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: const [
+                        ProfileListing(),
+                        ProfileListing(),
+                        ProfileListing(),
+                      ],
+                    ),
                   ),
                 ),
               ],
