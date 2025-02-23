@@ -11,6 +11,11 @@ class UserApiHelper {
     return prefs.getString('token');
   }
 
+  static Future<String?> getUserId() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getString('userId');
+  }
+
   // Common headers for API requests
   static Map<String, String> _headers({String? token}) {
     return {
@@ -37,7 +42,6 @@ class UserApiHelper {
       );
 
       final data = jsonDecode(response.body);
-      print(data);
       if (response.statusCode == 201) {
         return data;
       } else {
@@ -66,6 +70,7 @@ class UserApiHelper {
         if (data.containsKey('token')) {
           final prefs = await SharedPreferences.getInstance();
           await prefs.setString('token', data['token']);
+          await prefs.setString('userId', data['user']['userId']);
           return {
             'message': data['message'] ?? 'User signed in successfully',
             'user': data['user']
@@ -96,41 +101,47 @@ class UserApiHelper {
   }
 
   // Change Password
-  static Future<bool> changePassword(
-      String oldPassword, String newPassword) async {
+  static Future<bool> changePassword(String newPassword) async {
     String? token = await getToken();
 
-    try {
-      final response = await http.put(Uri.parse('$baseUrl/change-password'),
-          headers: _headers(token: token),
-          body: jsonEncode(
-              {"old_password": oldPassword, "new_password": newPassword}));
+    if (token != null) {
+      try {
+        final response = await http.post(
+            Uri.parse('$baseUrl/users/change-password'),
+            headers: _headers(token: token),
+            body: jsonEncode({"newPassword": newPassword}));
 
-      if (response.statusCode == 200) {
-        return true;
-      } else {
-        print("Failed to change password: ${response.body}");
+        if (response.statusCode == 200) {
+          return true;
+        } else {
+          print("Failed to change password: ${response.body}");
+          return false;
+        }
+      } catch (e) {
+        print("Error changing password: $e");
         return false;
       }
-    } catch (e) {
-      print("Error changing password: $e");
+    } else {
       return false;
     }
   }
 
-  static Future<Map<String, String>> getUserProfile() async {
+  static Future<Map<String, dynamic>> getUserProfile() async {
     String? token = await getToken();
+    String? userId = await getUserId();
 
     try {
-      final response = await http.get(Uri.parse('$baseUrl/user-profile'),
+      final response = await http.get(Uri.parse('$baseUrl/users/user/$userId'),
           headers: _headers(token: token));
 
       if (response.statusCode == 200) {
         Map<String, dynamic> data = jsonDecode(response.body);
         return {
-          'name': data['name'] ?? 'Unknown',
-          'bio': data['bio'] ?? 'No bio available',
-          'profile': data['profile'] ?? 'assets/images/user.jpeg'
+          'fullName': data['fullName'] ?? 'Unknown',
+          'bio': (data['bio'] != null && data['bio'].isNotEmpty)
+              ? data['bio']
+              : 'Write Your Bio',
+          'profileImage': data['profileImage'] ?? 'assets/images/user.jpeg'
         };
       } else {
         print("Failed to fetch profile data: ${response.body}");
@@ -142,23 +153,25 @@ class UserApiHelper {
     }
   }
 
-  static Future<Map<String, String>> updateUserProfile(
+  static Future<Map<String, dynamic>> updateUserProfile(
     String name,
     String bio,
     String profileImageUrl,
   ) async {
     String? token = await getToken();
+    String? userId = await getUserId();
 
     try {
-      final response = await http.post(Uri.parse('$baseUrl/update-profile'),
+      final response = await http.put(Uri.parse('$baseUrl/users/user/$userId'),
           headers: _headers(token: token),
           body: json.encode({
-            'name': name,
+            'fullName': name,
             'bio': bio,
-            'profile': profileImageUrl,
+            'profileImage': profileImageUrl,
           }));
 
       if (response.statusCode == 200) {
+        print(response.body);
         return json.decode(response.body);
       } else {
         print('Failed to update profile: ${response.statusCode}');

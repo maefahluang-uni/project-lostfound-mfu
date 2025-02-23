@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:lost_found_mfu/components/common/sos_button.dart';
 import 'package:lost_found_mfu/components/utils/bottom_navigation.dart';
 import 'package:lost_found_mfu/components/utils/custom_tabbar.dart';
+import 'package:lost_found_mfu/helpers/user_api_helper.dart';
 import 'package:lost_found_mfu/ui/screens/chat/chat_screen.dart';
 import 'package:lost_found_mfu/ui/screens/notification_screen.dart';
 import 'package:lost_found_mfu/ui/screens/post/upload_post.dart';
@@ -18,6 +19,13 @@ class Home extends StatefulWidget {
 
 class _HomeState extends State<Home> {
   int _selectedIndex = 0;
+  late Future<Map<String, dynamic>> userProfile;
+
+  @override
+  void initState() {
+    super.initState();
+    userProfile = UserApiHelper.getUserProfile();
+  }
 
   void _onItemTapped(int index) {
     if (_selectedIndex != index) {
@@ -77,11 +85,25 @@ class _HomeState extends State<Home> {
                         Profile()), // Assuming you want to navigate to Setting
               );
             },
-            child: CircleAvatar(
-              radius: 18, // Size of the circle avatar
-              backgroundImage: NetworkImage(
-                "https://thumbs.dreamstime.com/b/portrait-lego-man-minifigure-against-gray-baseplate-tambov-russian-federation-october-studio-shot-167467396.jpg",
-              ),
+            child: FutureBuilder<Map<String, dynamic>>(
+              future: userProfile,
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return const Center(child: CircularProgressIndicator());
+                }
+
+                if (snapshot.hasError) {
+                  return const Center(child: Text("Error loading profile"));
+                }
+                final userData = snapshot.data;
+                if (userData == null || userData.isEmpty) {
+                  return const Center(child: Text("No profile data available"));
+                }
+                return CircleAvatar(
+                    radius: 18, // Size of the circle avatar
+                    backgroundImage: AssetImage(
+                        userData['profile'] ?? "assets/images/user.jpeg"));
+              },
             ),
           ),
           const SizedBox(width: 10), // Add spacing from the edge

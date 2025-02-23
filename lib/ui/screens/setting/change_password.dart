@@ -135,7 +135,7 @@ class _ChangePasswordState extends State<ChangePassword> {
 
                                         bool success =
                                             await UserApiHelper.changePassword(
-                                                oldPassword, newPassword);
+                                                newPassword);
                                         if (success) {
                                           ScaffoldMessenger.of(context)
                                               .showSnackBar(

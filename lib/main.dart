@@ -9,13 +9,28 @@ import 'package:lost_found_mfu/ui/screens/home.dart';
 import 'package:lost_found_mfu/ui/screens/auth/login.dart';
 import 'package:lost_found_mfu/ui/screens/setting/setting.dart';
 import 'package:lost_found_mfu/ui/screens/auth/signup.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
-void main() {
-  runApp(const MyApp());
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  String initialRoute = await getInitialRoute();
+  runApp(MyApp(initialRoute: initialRoute));
+}
+
+Future<String> getInitialRoute() async {
+  final SharedPreferences prefs = await SharedPreferences.getInstance();
+  final String? token = prefs.getString('token');
+
+  if (token != null && token.isNotEmpty) {
+    return '/';
+  } else {
+    return '/login';
+  }
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+  final String initialRoute;
+  const MyApp({super.key, required this.initialRoute});
 
   @override
   Widget build(BuildContext context) {
@@ -27,7 +42,7 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.white),
         useMaterial3: true,
       ),
-      initialRoute: '/',
+      initialRoute: initialRoute,
       routes: {
         '/': (context) => const Home(),
         '/signup': (context) => Signup(),
