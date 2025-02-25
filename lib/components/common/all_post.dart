@@ -10,13 +10,26 @@ class AllPost extends StatefulWidget {
 }
 
 class _AllPostState extends State<AllPost> {
-  late Future<List<Map<String, dynamic>>> posts;
+  String? _userId;
+  late Future<List<Map<String, dynamic>>> _futurePosts;
   bool isLoading = true;
 
   @override
   void initState() {
     super.initState();
-    posts = fetchPosts();
+    loadUserData();
+  }
+
+  void loadUserData() async {
+    String? userId = await PostApiHelper.getUserId();
+    if (userId != null) {
+      setState(() {
+        _userId = userId;
+        _futurePosts = fetchPosts();
+      });
+    } else {
+      print("UserId is missing. Fetching posts will fail.");
+    }
   }
 
   Future<List<Map<String, dynamic>>> fetchPosts() async {
@@ -28,7 +41,7 @@ class _AllPostState extends State<AllPost> {
   Widget build(BuildContext context) {
     return Scaffold(
         body: FutureBuilder(
-            future: posts,
+            future: _futurePosts,
             builder: (context, snapshot) {
               if (snapshot.connectionState == ConnectionState.waiting) {
                 return const Center(child: CircularProgressIndicator());

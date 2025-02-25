@@ -12,19 +12,20 @@ class CustomTextField extends StatelessWidget {
   final IconData? prefixIcon;
   final double? height;
   final Function(String)? onChanged;
+  final int? maxLines;
 
-  const CustomTextField({
-    super.key,
-    required this.controller,
-    this.label,
-    this.validator,
-    this.keyboardType = TextInputType.text,
-    this.suffixIcon,
-    this.prefixIcon,
-    this.inputFormatters,
-    this.onChanged,
-    this.height,
-  });
+  const CustomTextField(
+      {super.key,
+      required this.controller,
+      this.label,
+      this.validator,
+      this.keyboardType = TextInputType.text,
+      this.suffixIcon,
+      this.prefixIcon,
+      this.inputFormatters,
+      this.onChanged,
+      this.height,
+      this.maxLines});
 
   @override
   Widget build(BuildContext context) {
@@ -46,6 +47,8 @@ class CustomTextField extends StatelessWidget {
         validator: validator,
         inputFormatters: inputFormatters,
         textAlignVertical: TextAlignVertical.center,
+        maxLines: maxLines ?? 1,
+        style: TextStyle(color: Colors.black),
         decoration: InputDecoration(
           contentPadding: EdgeInsets.symmetric(
             vertical: (height ?? 48),

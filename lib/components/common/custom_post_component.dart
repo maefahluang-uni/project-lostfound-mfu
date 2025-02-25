@@ -98,18 +98,22 @@ class UserInfoRow extends StatelessWidget {
           children: [
             IconButton(
                 onPressed: () {},
-                icon: Badge(
-                  label: Padding(
-                    padding: const EdgeInsets.all(4.0),
-                    child: Text(
-                      postData['itemStatus'],
-                      style:
-                          TextStyle(fontSize: 10, fontWeight: FontWeight.bold),
+                icon: SizedBox(
+                  width: 50,
+                  height: 25,
+                  child: Badge(
+                    label: Padding(
+                      padding: const EdgeInsets.all(4.0),
+                      child: Text(
+                        postData['itemStatus'],
+                        style: TextStyle(
+                            fontSize: 10, fontWeight: FontWeight.bold),
+                      ),
                     ),
+                    backgroundColor: postData['itemStatus'] == 'Lost'
+                        ? Colors.redAccent
+                        : Colors.green,
                   ),
-                  backgroundColor: postData['itemStatus'] == 'Lost'
-                      ? Colors.redAccent
-                      : Colors.green,
                 )),
             PopupMenuButton<String>(
               onSelected: handleMenuSelection,

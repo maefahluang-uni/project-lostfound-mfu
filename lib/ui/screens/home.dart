@@ -50,10 +50,12 @@ class _HomeState extends State<Home> {
     }
     return Scaffold(
       body: _pages[_selectedIndex],
-      bottomNavigationBar: BottomNavigation(
-        currentIndex: _selectedIndex,
-        onTap: _onItemTapped,
-      ),
+      bottomNavigationBar: _selectedIndex == 2
+          ? null
+          : BottomNavigation(
+              currentIndex: _selectedIndex,
+              onTap: _onItemTapped,
+            ),
     );
   }
 
