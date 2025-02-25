@@ -1,19 +1,37 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
-import 'package:cached_network_image/cached_network_image.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:lost_found_mfu/components/custom_button.dart';
 import 'package:lost_found_mfu/ui/screens/post/upload_post.dart';
 
-class GalleryScreen extends StatelessWidget {
+class GalleryScreen extends StatefulWidget {
   const GalleryScreen({super.key});
+
+  @override
+  _GalleryScreenState createState() => _GalleryScreenState();
+}
+
+class _GalleryScreenState extends State<GalleryScreen> {
+  final ImagePicker _picker = ImagePicker();
+  List<File> _selectedImage = [];
+
+  Future<void> _pickImages() async {
+    final List<XFile>? pickedFiles = await _picker.pickMultiImage();
+    if (pickedFiles != null) {
+      setState(() {
+        _selectedImage = pickedFiles.map((file) => File(file.path)).toList();
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
-          onPressed: () => Navigator.pop(context),
-        ),
+            onPressed: () => Navigator.pop(context),
+            icon: const Icon(Icons.arrow_back)),
         title: const Text(
           'Gallery',
           style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
@@ -22,37 +40,50 @@ class GalleryScreen extends StatelessWidget {
           Padding(
             padding: const EdgeInsets.only(right: 16),
             child: CustomButton(
-              text: 'Next',
-              width: 100,
-              onPressed: () {
-                Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) => UploadPostScreen()));
-              },
-            ),
-          ),
+                text: 'Next',
+                width: 100,
+                onPressed: () {
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => UploadPostScreen()));
+                }),
+          )
         ],
       ),
-      body: GridView.builder(
-        padding: const EdgeInsets.all(1),
-        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-          crossAxisCount: 3,
-          crossAxisSpacing: 1,
-          mainAxisSpacing: 1,
-        ),
-        itemCount: 15, // Example count
-        itemBuilder: (context, index) {
-          return CachedNetworkImage(
-            imageUrl:
-                'https://hebbkx1anhila5yf.public.blob.vercel-storage.com/Screenshot%202025-02-03%20at%204.46.03%E2%80%AFPM-QJz2fdizg2MZMOzxSKZ0R7eaTqcq2w.png',
-            fit: BoxFit.cover,
-            placeholder: (context, url) => const Center(
-              child: CircularProgressIndicator(),
+      body: Column(
+        children: [
+          Expanded(
+              child: _selectedImage.isEmpty
+                  ? const Center(
+                      child: Text('No image selected'),
+                    )
+                  : GridView.builder(
+                      padding: const EdgeInsets.all(2),
+                      gridDelegate:
+                          const SliverGridDelegateWithFixedCrossAxisCount(
+                              crossAxisCount: 3,
+                              crossAxisSpacing: 2,
+                              mainAxisSpacing: 2),
+                      itemCount: _selectedImage.length,
+                      itemBuilder: (context, index) {
+                        return Image.file(
+                          _selectedImage[index],
+                          fit: BoxFit.cover,
+                        );
+                      })),
+          Padding(
+            padding: const EdgeInsets.all(8),
+            child: CustomButton(
+              text: 'Pick Images',
+              onPressed: _pickImages,
+              width: 150,
             ),
-            errorWidget: (context, url, error) => const Icon(Icons.error),
-          );
-        },
+          ),
+          SizedBox(
+            height: 20,
+          )
+        ],
       ),
     );
   }

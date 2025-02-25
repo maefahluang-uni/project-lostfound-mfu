@@ -25,13 +25,13 @@ class PostApiHelper {
     };
   }
 
-  static Future<bool> uploadPost({
+  static Future<Map<String, dynamic>> uploadPost({
     required String item,
     required String itemStatus,
     required String date,
     required String time,
     required String location,
-    required File imageFile,
+    File? imageFile,
     String? color,
     String? phone,
     String? desc,
@@ -39,7 +39,7 @@ class PostApiHelper {
     String? token = await getToken();
     if (token == null) {
       print("User not authenticated");
-      return false;
+      return {};
     }
 
     var uri = Uri.parse('$baseUrl/posts/upload-post');
@@ -55,24 +55,28 @@ class PostApiHelper {
     if (phone != null) request.fields['phone'] = phone;
     if (desc != null) request.fields['desc'] = desc;
 
-    var stream = http.ByteStream(imageFile.openRead());
-    var length = await imageFile.length();
-    var multipartFile = http.MultipartFile('photos', stream, length,
-        filename: basename(imageFile.path));
-    request.files.add(multipartFile);
+    if (imageFile != null) {
+      var stream = http.ByteStream(imageFile!.openRead());
+      var length = await imageFile.length();
+      var multipartFile = http.MultipartFile('photos', stream, length,
+          filename: basename(imageFile.path));
+      request.files.add(multipartFile);
+    } else {
+      print("No image selected, skipping image upload.");
+    }
 
     try {
       var response = await request.send();
       if (response.statusCode == 201) {
         print("Post uploaded successfully");
-        return true;
+        return {"success": true, "message": "Post uploaded successfully"};
       } else {
         print("Failed to upload post: ${response.statusCode}");
-        return false;
+        return {"success": false, "message": "Failed to upload post"};
       }
     } catch (e) {
       print("Error uploading post: $e");
-      return false;
+      return {"success": false, "message": "Error uploading post"};
     }
   }
 
