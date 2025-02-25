@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:lost_found_mfu/components/common/copy_link.dart';
+import 'package:lost_found_mfu/ui/screens/detail.dart';
 import 'package:lost_found_mfu/ui/theme/app_color.dart';
 
 class CustomPostComponent extends StatelessWidget {
@@ -26,7 +27,9 @@ class CustomPostComponent extends StatelessWidget {
           const SizedBox(height: 10),
           PostImage(postData: postData),
           const SizedBox(height: 10),
-          PostActions(),
+          PostActions(
+            id: postData['id'],
+          ),
           const SizedBox(height: 10),
           Row(
             mainAxisAlignment: MainAxisAlignment.start,
@@ -54,7 +57,6 @@ class CustomPostComponent extends StatelessWidget {
   }
 }
 
-// User Information Row with Avatar, Name, and Location
 class UserInfoRow extends StatelessWidget {
   final Map<String, dynamic> postData;
   final void Function(String) handleMenuSelection;
@@ -176,19 +178,44 @@ class PostImage extends StatelessWidget {
 
 // Actions (Message & Copy Link)
 class PostActions extends StatelessWidget {
-  const PostActions({super.key});
+  final String id;
+
+  const PostActions({super.key, required this.id});
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.start,
-      children: [
-        const Icon(Icons.message, color: Colors.red),
-        const SizedBox(width: 8),
-        const Text("Message", style: TextStyle(color: Colors.red)),
-        const SizedBox(width: 20),
-        CopyLink(),
-      ],
+    return SizedBox(
+      height: 20,
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        children: [
+          const Icon(
+            Icons.message,
+            color: Colors.red,
+            size: 20,
+          ),
+          const SizedBox(width: 8),
+          const Text("Message", style: TextStyle(color: Colors.red)),
+          const SizedBox(width: 20),
+          CopyLink(),
+          const SizedBox(width: 8),
+          Row(
+            children: [
+              IconButton(
+                  onPressed: () {
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => DetailScreen(postId: id)));
+                  },
+                  iconSize: 20,
+                  padding: EdgeInsets.zero,
+                  icon: Icon(Icons.remove_red_eye_outlined, color: Colors.red)),
+              Text("View Detail", style: TextStyle(color: Colors.red)),
+            ],
+          ),
+        ],
+      ),
     );
   }
 }

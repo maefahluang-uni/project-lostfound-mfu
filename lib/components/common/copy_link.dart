@@ -36,6 +36,7 @@ class _CopyLinkState extends State<CopyLink> {
           Icon(
             isCopied ? Icons.check : Icons.copy,
             color: isCopied ? Colors.green : Colors.red,
+            size: 18,
           ),
           const SizedBox(width: 8),
           Text(

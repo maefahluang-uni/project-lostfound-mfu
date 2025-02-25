@@ -56,7 +56,7 @@ class PostApiHelper {
     if (desc != null) request.fields['desc'] = desc;
 
     if (imageFile != null) {
-      var stream = http.ByteStream(imageFile!.openRead());
+      var stream = http.ByteStream(imageFile.openRead());
       var length = await imageFile.length();
       var multipartFile = http.MultipartFile('photos', stream, length,
           filename: basename(imageFile.path));
@@ -107,6 +107,23 @@ class PostApiHelper {
     } catch (e) {
       print("Error fetching posts: $e");
       return [];
+    }
+  }
+
+  static Future<Map<String, dynamic>> getSinglePost(String postId) async {
+    String? token = await getToken();
+    if (token == null) {
+      throw Exception("User is not authenticated");
+    }
+
+    final response = await http.get(
+        Uri.parse('$baseUrl/posts/get-single-post/${postId}'),
+        headers: _headers(token: token));
+
+    if (response.statusCode == 200) {
+      return jsonDecode(response.body);
+    } else {
+      throw Exception("Failed to load post: ${response.body}");
     }
   }
 }
