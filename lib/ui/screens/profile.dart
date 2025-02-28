@@ -14,11 +14,38 @@ class Profile extends StatefulWidget {
 
 class _ProfileState extends State<Profile> {
   late Future<Map<String, dynamic>> userProfile;
+  String itemStatus = 'Pending';
 
   @override
   void initState() {
     super.initState();
-    userProfile = UserApiHelper.getUserProfile();
+    loadUserProfile();
+  }
+
+  // Method to load user profile
+  void loadUserProfile() {
+    setState(() {
+      userProfile = UserApiHelper.getUserProfile();
+    });
+  }
+
+  // Method to update status when resolved
+  void updateStatus(String newStatus) {
+    setState(() {
+      itemStatus = newStatus;
+    });
+  }
+
+  // Method to delete a post
+  void deletePostFromList(String postId) {
+    setState(() {
+      userProfile = userProfile.then((profile) {
+        profile['posts'] = (profile['posts'] as List)
+            .where((post) => post['id'] != postId)
+            .toList();
+        return profile;
+      });
+    });
   }
 
   @override
@@ -81,16 +108,29 @@ class _ProfileState extends State<Profile> {
                 const SizedBox(height: 10),
                 Expanded(
                   child: SingleChildScrollView(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: const [
-                        ProfileListing(),
-                        ProfileListing(),
-                        ProfileListing(),
-                      ],
-                    ),
+                    child: userData['posts'] != null &&
+                            userData['posts'] is List &&
+                            (userData['posts'] as List).isNotEmpty
+                        ? Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: (userData['posts'] as List<dynamic>)
+                                .map((post) => ProfileListing(
+                                      postId: post['id'] ?? "Invalid Id",
+                                      item: post['item'] ?? "Unknown Item",
+                                      status: post['itemStatus'] ??
+                                          "Unknown Status",
+                                      date: post['date'] ?? "No Date",
+                                      description:
+                                          post['desc'] ?? "No Description",
+                                      onStatusUpdate: updateStatus,
+                                      onDelete: () =>
+                                          deletePostFromList(post['id']),
+                                    ))
+                                .toList(),
+                          )
+                        : const Center(child: Text("No posts available")),
                   ),
-                ),
+                )
               ],
             );
           },
