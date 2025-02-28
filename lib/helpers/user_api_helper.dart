@@ -1,9 +1,14 @@
 import 'dart:convert';
+import 'package:google_sign_in/google_sign_in.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class UserApiHelper {
   static final String? baseUrl = 'http://localhost:3001/api';
+  final GoogleSignIn _googleSignIn = GoogleSignIn(
+    scopes: <String>['email'],
+  );
 
   // Get token from shared preferences
   static Future<String?> getToken() async {
@@ -202,6 +207,46 @@ class UserApiHelper {
     } catch (e) {
       print("Error deleting account: $e");
       return true;
+    }
+  }
+
+  static Future<Map<String, dynamic>> signInWithGoogle() async {
+    try {
+      final GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
+      if (googleUser == null) return {'error': 'Google sign-in failed'};
+
+      final GoogleSignInAuthentication googleAuth =
+          await googleUser.authentication;
+      final idToken = googleAuth.idToken;
+
+      if (idToken == null) throw Exception("Failed to get idToken");
+
+      final response = await http.post(
+        Uri.parse("$baseUrl/users/google-signin"),
+        body: jsonEncode({"idToken": idToken}),
+      );
+
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        return data['token'];
+      } else {
+        return {'error': "Failed to authenticate: ${response.body}"};
+      }
+    } catch (e) {
+      print("Error signing in with Google: $e");
+      return {'error': "Error signing in with Google: $e"};
+    }
+  }
+
+  static Future<UserCredential?> authenticateWithFirebase(
+      String customToken) async {
+    try {
+      final UserCredential userCredential =
+          await FirebaseAuth.instance.signInWithCustomToken(customToken);
+      return userCredential;
+    } catch (e) {
+      print("Firebase Authentication Error: $e");
+      return null;
     }
   }
 }

@@ -245,7 +245,23 @@ class _LoginState extends State<Login> {
             side: BorderSide(color: Colors.grey),
           ),
         ),
-        onPressed: () {},
+        onPressed: () async {
+          print("Google Sign-In");
+          final response = await UserApiHelper.signInWithGoogle();
+          if (response.containsKey('error')) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text(response['error'].toString())),
+            );
+          } else {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text('Google Sign-In Successful')),
+            );
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(builder: (context) => const Home()),
+            );
+          }
+        },
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
