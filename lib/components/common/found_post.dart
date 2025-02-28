@@ -20,7 +20,8 @@ class _FoundPostState extends State<FoundPost> {
   }
 
   Future<List<Map<String, dynamic>>> fetchFoundPosts() async {
-    List<Map<String, dynamic>> data = await PostApiHelper.getPosts('Found');
+    List<Map<String, dynamic>> data =
+        await PostApiHelper.getPosts(itemStatus: 'Found');
 
     return data;
   }

@@ -3,7 +3,9 @@ import 'package:flutter/material.dart';
 class CustomAppbar extends StatelessWidget implements PreferredSizeWidget {
   final String appBarTitle;
   final bool hasBackArrow;
-  CustomAppbar({super.key, required this.appBarTitle, required this.hasBackArrow}) : preferredSize = Size.fromHeight(kToolbarHeight);
+  CustomAppbar(
+      {super.key, required this.appBarTitle, required this.hasBackArrow})
+      : preferredSize = Size.fromHeight(kToolbarHeight);
 
   @override
   final Size preferredSize;
@@ -15,20 +17,24 @@ class CustomAppbar extends StatelessWidget implements PreferredSizeWidget {
           ),
       height: 120,
       child: Padding(
-        padding: EdgeInsets.only(top: 20),
+        padding: EdgeInsets.only(top: 40),
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            hasBackArrow ? Padding(
-              padding: const EdgeInsets.only(left: 15),
-              child: InkWell(
-                  onTap: () => Navigator.pop(context),
-                  child: Icon(Icons.arrow_back_rounded, size: 40)),
-            )
-             : SizedBox(),
+            hasBackArrow
+                ? Padding(
+                    padding: const EdgeInsets.only(left: 15),
+                    child: InkWell(
+                        onTap: () => Navigator.pop(context),
+                        child: Icon(Icons.arrow_back_rounded, size: 40)),
+                  )
+                : SizedBox(),
             Padding(
-              padding: const EdgeInsets.only(left:20),
-              child: Text(appBarTitle, style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),),
+              padding: const EdgeInsets.only(left: 20),
+              child: Text(
+                appBarTitle,
+                style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+              ),
             )
           ],
         ),

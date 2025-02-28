@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:lost_found_mfu/components/common/custom_appbar.dart';
 import 'package:lost_found_mfu/helpers/user_api_helper.dart';
 import 'package:lost_found_mfu/ui/screens/auth/login.dart';
 import 'package:lost_found_mfu/ui/screens/setting/about.dart';
@@ -21,13 +22,7 @@ class _SettingState extends State<Setting> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text(
-          "Setting",
-          style: TextStyle(fontWeight: FontWeight.bold),
-        ),
-        centerTitle: false,
-      ),
+      appBar: CustomAppbar(appBarTitle: "Setting", hasBackArrow: true),
       body: Column(
         children: [
           buildSettingRow("About", Icons.question_mark_outlined, () {

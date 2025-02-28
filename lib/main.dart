@@ -10,9 +10,11 @@ import 'package:lost_found_mfu/ui/screens/auth/login.dart';
 import 'package:lost_found_mfu/ui/screens/setting/setting.dart';
 import 'package:lost_found_mfu/ui/screens/auth/signup.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:firebase_core/firebase_core.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp();
   String initialRoute = await getInitialRoute();
   runApp(MyApp(initialRoute: initialRoute));
 }

@@ -81,16 +81,24 @@ class PostApiHelper {
   }
 
   static Future<List<Map<String, dynamic>>> getPosts(
-      [String? itemStatus]) async {
+      {String? itemStatus, String? search}) async {
     String? token = await getToken();
-    String itemStatusParam = (itemStatus != null && itemStatus.isNotEmpty)
-        ? '?itemStatus=$itemStatus'
-        : '';
+
+    Map<String, String> queryParams = {};
+    if (itemStatus != null && itemStatus.isNotEmpty) {
+      queryParams['itemStatus'] = itemStatus;
+    }
+    if (search != null && search.isNotEmpty) {
+      queryParams['search'] = search;
+    }
+
+    String queryString = Uri(queryParameters: queryParams).query;
+    String url =
+        '$baseUrl/posts/get-posts${queryString.isNotEmpty ? '?$queryString' : ''}';
 
     try {
-      final response = await http.get(
-          Uri.parse('$baseUrl/posts/get-posts$itemStatusParam'),
-          headers: _headers(token: token));
+      final response =
+          await http.get(Uri.parse(url), headers: _headers(token: token));
 
       if (response.statusCode == 200) {
         Map<String, dynamic> data = jsonDecode(response.body);
