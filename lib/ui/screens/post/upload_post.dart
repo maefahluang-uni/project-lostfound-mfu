@@ -20,7 +20,7 @@ class UploadPostScreen extends StatefulWidget {
 }
 
 class _UploadPostScreenState extends State<UploadPostScreen> {
-  final _formKey = GlobalKey<FormState>();
+  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   final _itemController = TextEditingController();
   final _itemStatusController = TextEditingController();
   final _colorController = TextEditingController();
@@ -55,13 +55,17 @@ class _UploadPostScreenState extends State<UploadPostScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              CustomTextField(
-                label: 'Item',
+              _buildTextField(
                 controller: _itemController,
-                validator: (value) =>
-                    value!.isEmpty ? "Name can't be empty" : null,
+                label: "Item",
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return "Item can't be empty";
+                  }
+                  return null;
+                },
+                textCapitalization: TextCapitalization.words,
               ),
-              const SizedBox(height: 16),
               CustomDropdown(
                 controller: _itemStatusController,
                 label: 'Lost/Found',
@@ -86,9 +90,9 @@ class _UploadPostScreenState extends State<UploadPostScreen> {
                 onChanged: (value) {},
               ),
               const SizedBox(height: 16),
-              CustomTextField(
-                label: 'Phone Number',
+              _buildTextField(
                 controller: _phoneController,
+                label: "Phone Number",
                 keyboardType: TextInputType.phone,
                 inputFormatters: [FilteringTextInputFormatter.digitsOnly],
                 validator: (value) {
@@ -99,25 +103,18 @@ class _UploadPostScreenState extends State<UploadPostScreen> {
                   }
                   return null;
                 },
+                textCapitalization: TextCapitalization.words,
               ),
-              const SizedBox(height: 16),
               DateTimePickerRow(
                 dateController: _dateController,
                 timeController: _timeController,
               ),
               const SizedBox(height: 16),
-              CustomTextField(
-                label: 'Location',
+              _buildTextField(
                 controller: _locationController,
-                // validator: (value) {
-                //   if (value!.length > 30) {
-                //     return "Location should be maximum 30 characters";
-                //   } else {
-                //     return "";
-                //   }
-                // },
+                label: "Location",
+                textCapitalization: TextCapitalization.words,
               ),
-              const SizedBox(height: 16),
               Text(
                 "Description",
                 style: TextStyle(
@@ -127,14 +124,42 @@ class _UploadPostScreenState extends State<UploadPostScreen> {
                 ),
               ),
               const SizedBox(height: 6),
-              CustomTextField(
-                label: '',
-                controller: _descriptionController,
-                height: 120,
-                // maxLines: null,
-                keyboardType: TextInputType.multiline,
+              Container(
+                height: 120, // Set height for the text area
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(12),
+                  boxShadow: [
+                    BoxShadow(
+                      color: AppColor.theme.primaryColor.withOpacity(0.2),
+                      blurRadius: 4,
+                      spreadRadius: 2,
+                      offset: const Offset(0, 2),
+                    ),
+                  ],
+                ),
+                child: TextField(
+                  controller: _descriptionController,
+                  keyboardType: TextInputType.multiline,
+                  textAlignVertical:
+                      TextAlignVertical.top, // Align text to the top
+                  maxLines: 4, // Allow unlimited lines
+                  style: TextStyle(color: Colors.black),
+                  decoration: InputDecoration(
+                    contentPadding:
+                        EdgeInsets.symmetric(vertical: 16, horizontal: 12),
+                    enabledBorder: OutlineInputBorder(
+                      borderSide: BorderSide(color: Colors.grey),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderSide: const BorderSide(color: Colors.red),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                  ),
+                ),
               ),
-              const SizedBox(height: 16),
+              const SizedBox(height: 20),
               selectedImages != null && selectedImages!.isNotEmpty
                   ? Container(
                       height: 300,
@@ -157,7 +182,7 @@ class _UploadPostScreenState extends State<UploadPostScreen> {
                       onTap: _pickImages,
                       child: UploadPhotoBox(),
                     ),
-              const SizedBox(height: 14),
+              const SizedBox(height: 20),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
@@ -210,6 +235,13 @@ class _UploadPostScreenState extends State<UploadPostScreen> {
                           Navigator.push(context,
                               MaterialPageRoute(builder: (context) => Home()));
                         }
+                      } else {
+                        print("Form is invalid");
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                              content:
+                                  Text('Please fill in all required fields')),
+                        );
                       }
                     },
                   ),
@@ -222,6 +254,56 @@ class _UploadPostScreenState extends State<UploadPostScreen> {
       ),
     );
   }
+}
+
+Widget _buildTextField({
+  required TextEditingController controller,
+  required String label,
+  IconData? icon,
+  String? Function(String?)? validator,
+  bool obscureText = false,
+  List<TextInputFormatter>? inputFormatters,
+  TextCapitalization? textCapitalization,
+  TextInputType? keyboardType,
+}) {
+  return Column(
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: [
+      StatefulBuilder(
+        builder: (context, setState) {
+          String? errorText;
+
+          return Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              CustomTextField(
+                controller: controller,
+                label: label,
+                suffixIcon: icon,
+                validator: validator,
+                obscureText: obscureText,
+                inputFormatters: inputFormatters,
+                onChanged: (value) {
+                  setState(() {
+                    errorText = validator?.call(value);
+                  });
+                },
+              ),
+              if (errorText != null)
+                Padding(
+                  padding: const EdgeInsets.only(top: 5, left: 8),
+                  child: Text(
+                    errorText!,
+                    style: const TextStyle(color: Colors.red, fontSize: 12),
+                  ),
+                ),
+            ],
+          );
+        },
+      ),
+      const SizedBox(height: 20),
+    ],
+  );
 }
 
 class UploadPhotoBox extends StatelessWidget {

@@ -42,6 +42,7 @@ class _SettingState extends State<Setting> {
             Navigator.push(context,
                 MaterialPageRoute(builder: (context) => ChangePassword()));
           }),
+          buildAccountDeleteButton(),
           buildLogoutButton(),
         ],
       ),
@@ -171,6 +172,98 @@ class _SettingState extends State<Setting> {
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text("Logout failed. Please try again.")),
+      );
+    }
+  }
+
+  Widget buildAccountDeleteButton() {
+    return Padding(
+      padding: const EdgeInsets.all(20),
+      child: InkWell(
+        onTap: _showAccountDeleteDialog,
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Container(
+              padding: EdgeInsets.all(10),
+              decoration: BoxDecoration(
+                color: Colors.grey[300],
+                borderRadius: BorderRadius.circular(15.0),
+              ),
+              child: Icon(Icons.warning, size: 20, color: Colors.red),
+            ),
+            Expanded(
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 50),
+                child: Text(
+                  "Delete Account",
+                  style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.red),
+                  textAlign: TextAlign.left,
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Future<void> _showAccountDeleteDialog() async {
+    bool? shouldDelete = await showDialog<bool>(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text("Confirm Delete Account"),
+          content: const Text(
+              "Are you sure you want to delete your account? This can be undone."),
+          actions: [
+            OutlinedButton(
+              style: OutlinedButton.styleFrom(
+                side: BorderSide(color: Color(0xFFCF2D1E), width: 1),
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10)),
+              ),
+              onPressed: () => Navigator.of(context).pop(false),
+              child: Text("Cancel",
+                  style: TextStyle(color: Color(0xFFCF2D1E), fontSize: 12)),
+            ),
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Color(0xFFCF2D1E),
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10)),
+              ),
+              onPressed: () async {
+                Navigator.of(context).pop(); // Close dialog before logout
+                _handleDeleteAccount();
+              },
+              child: Text("Delete",
+                  style: TextStyle(color: Colors.white, fontSize: 12)),
+            ),
+          ],
+        );
+      },
+    );
+
+    if (shouldDelete == true) {
+      _handleDeleteAccount();
+    }
+  }
+
+  Future<void> _handleDeleteAccount() async {
+    bool isDeleteAccount = await UserApiHelper.deleteUser();
+    if (isDeleteAccount) {
+      Navigator.pushReplacement(
+          context, MaterialPageRoute(builder: (context) => Login()));
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Deleted Successfully")),
+      );
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Delete account failed. Please try again.")),
       );
     }
   }

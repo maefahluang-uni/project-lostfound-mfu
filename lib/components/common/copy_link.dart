@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart'; // Import for Clipboard functionality
 
 class CopyLink extends StatefulWidget {
-  const CopyLink({super.key});
+  final String postId;
+
+  const CopyLink({super.key, required this.postId});
 
   @override
   State<CopyLink> createState() => _CopyLinkState();
@@ -10,9 +12,12 @@ class CopyLink extends StatefulWidget {
 
 class _CopyLinkState extends State<CopyLink> {
   bool isCopied = false;
+  static final String? baseUrl = 'http://localhost:3001/api';
 
   void _copyLink() {
-    Clipboard.setData(const ClipboardData(text: "https://example.com"));
+    String postUrl = "https://lost-and-found-in-mfu-service.web.app";
+    Clipboard.setData(ClipboardData(text: postUrl));
+
     setState(() {
       isCopied = true;
     });

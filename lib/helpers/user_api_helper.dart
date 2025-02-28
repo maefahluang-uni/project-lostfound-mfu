@@ -141,7 +141,8 @@ class UserApiHelper {
           'bio': (data['bio'] != null && data['bio'].isNotEmpty)
               ? data['bio']
               : 'Write Your Bio',
-          'profileImage': data['profileImage'] ?? 'assets/images/user.jpeg'
+          'profileImage': data['profileImage'] ?? 'assets/images/user.jpeg',
+          'posts': data['posts'] ?? []
         };
       } else {
         print("Failed to fetch profile data: ${response.body}");
@@ -180,6 +181,27 @@ class UserApiHelper {
     } catch (e) {
       print("Error fetching profile data: $e");
       return {};
+    }
+  }
+
+  static Future<bool> deleteUser() async {
+    String? token = await getToken();
+    String? userId = await getUserId();
+
+    try {
+      final response = await http.delete(
+          Uri.parse("$baseUrl/users/user/$userId"),
+          headers: _headers(token: token));
+      if (response.statusCode == 200) {
+        print(response.body);
+        return json.decode(response.body);
+      } else {
+        print('Failed to delete account: ${response.statusCode}');
+        return false;
+      }
+    } catch (e) {
+      print("Error deleting account: $e");
+      return true;
     }
   }
 }

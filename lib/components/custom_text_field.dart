@@ -25,22 +25,14 @@ class CustomTextField extends StatelessWidget {
       this.inputFormatters,
       this.onChanged,
       this.height,
-      this.maxLines});
+      this.maxLines,
+      bool? obscureText,
+      TextCapitalization? textCapitalization});
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      height: height ?? 48,
-      decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(12),
-          boxShadow: [
-            BoxShadow(
-                color: AppColor.theme.primaryColor.withValues(alpha: 0.2),
-                blurRadius: 4,
-                spreadRadius: 2,
-                offset: const Offset(0, 2))
-          ]),
+    return SizedBox(
+      height: 60,
       child: TextFormField(
         controller: controller,
         keyboardType: keyboardType,
@@ -50,9 +42,10 @@ class CustomTextField extends StatelessWidget {
         maxLines: maxLines ?? 1,
         style: TextStyle(color: Colors.black),
         decoration: InputDecoration(
+          border: OutlineInputBorder(),
           contentPadding: EdgeInsets.symmetric(
-            vertical: (height ?? 48),
-            horizontal: 12,
+            vertical: (height ?? 40),
+            horizontal: 20,
           ),
           suffixIcon: Icon(suffixIcon),
           prefixIcon: prefixIcon != null ? Icon(prefixIcon) : null,
