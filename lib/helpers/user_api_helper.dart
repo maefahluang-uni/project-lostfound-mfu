@@ -3,7 +3,7 @@ import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
 class UserApiHelper {
-  static final String? baseUrl = 'http://localhost:3001/api';
+  static final String? baseUrl = 'http://10.0.2.2:3001/api';
 
   // Get token from shared preferences
   static Future<String?> getToken() async {

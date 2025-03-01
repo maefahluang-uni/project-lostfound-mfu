@@ -5,14 +5,15 @@ import 'package:image_picker/image_picker.dart';
 import 'package:lost_found_mfu/ui/theme/app_color.dart';
 
 class ChatBubble extends StatelessWidget {
-  const ChatBubble({super.key, required this.isSelf, required this.messageType, this.messageImage});
+  const ChatBubble({super.key, required this.isSelf, required this.messageType, this.messageImage, this.messageContent, required this.messageTime});
   final bool isSelf;
   final String messageType;
   final XFile? messageImage;
-
+  final String? messageContent;
+  final String messageTime;
   Widget generateMessage(){
     switch (messageType){
-      case "text":
+      case "TEXT":
         return isSelf ? 
                 Padding(
                   padding: const EdgeInsets.only(bottom: 8),
@@ -29,7 +30,7 @@ class ChatBubble extends StatelessWidget {
                         ),
                         child: Padding(
                           padding: const EdgeInsets.only(left:11, top:13, right:11, bottom: 13),
-                          child: Text("Thank you! Thank you!Thank you!Thank you!Thank you!Thank you!Thank you!Thank you!Thank you!Thank you!", 
+                          child: Text(messageContent ?? "", 
                           style: TextStyle(fontSize: 18, color: Colors.white)),
                         ),
                       ),
@@ -52,13 +53,13 @@ class ChatBubble extends StatelessWidget {
                         ),
                         child: Padding(
                           padding: const EdgeInsets.only(left:11, top:13, right:11, bottom: 13),
-                          child: Text("Thank you!", style: TextStyle(fontSize: 18, color: Colors.black)),
+                          child: Text(messageContent ?? "", style: TextStyle(fontSize: 18, color: Colors.black)),
                         ),
                       ),
                     ]
                   ),
                 );
-      case "image":
+      case "IMAGE":
         return isSelf ?
         Padding(
           padding: const EdgeInsets.only(bottom: 8),

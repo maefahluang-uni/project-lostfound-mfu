@@ -6,7 +6,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
 
 class PostApiHelper {
-  static final String? baseUrl = 'http://localhost:3001/api';
+  static final String? baseUrl = 'http://10.0.2.2:3001/api';
 
   static Future<String?> getToken() async {
     final prefs = await SharedPreferences.getInstance();

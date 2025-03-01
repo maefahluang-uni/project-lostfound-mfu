@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:lost_found_mfu/helpers/chat_api_helper.dart';
+import 'package:lost_found_mfu/models/chat.dart';
+import 'package:lost_found_mfu/services/socket_service.dart';
 import 'package:lost_found_mfu/ui/screens/notification_screen.dart';
 import 'package:lost_found_mfu/ui/screens/profile.dart';
 import 'package:lost_found_mfu/ui/screens/search.dart';
@@ -13,7 +16,15 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  SocketService().initSocket();
+  List<ChatRoom> chatRooms = await ChatApiHelper.getChatRooms();
+  chatRooms.forEach((room) {
+    if (room.id != null) {
+      SocketService().joinRoom(room.id!);
+    }
+  });
   String initialRoute = await getInitialRoute();
+
   runApp(MyApp(initialRoute: initialRoute));
 }
 

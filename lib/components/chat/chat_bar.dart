@@ -8,17 +8,20 @@ class ChatBar extends StatelessWidget {
       required this.chatOwner,
       required this.messagePreview,
       required this.messageCount,
-      required this.messageTime});
+      required this.messageTime,
+      required this.chatRoomId,
+      });
   final String chatOwner;
   final String messagePreview;
   final String messageCount;
   final String messageTime;
+  final String chatRoomId;
   @override
   Widget build(BuildContext context) {
     return InkWell(
       onTap: (){
         Navigator.of(context).push(
-          MaterialPageRoute(builder: (context) => ChatInboxScreen())
+          MaterialPageRoute(builder: (context) => ChatInboxScreen(chatRoomId: this.chatRoomId))
         );
       },
       child: Container(
