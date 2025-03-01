@@ -246,7 +246,6 @@ class _LoginState extends State<Login> {
           ),
         ),
         onPressed: () async {
-          print("Google Sign-In");
           final response = await UserApiHelper.signInWithGoogle();
           if (response.containsKey('error')) {
             ScaffoldMessenger.of(context).showSnackBar(

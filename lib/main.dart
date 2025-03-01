@@ -15,7 +15,7 @@ import 'package:firebase_core/firebase_core.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
-  String initialRoute = await getInitialRoute();
+  final String initialRoute = await getInitialRoute();
   runApp(MyApp(initialRoute: initialRoute));
 }
 

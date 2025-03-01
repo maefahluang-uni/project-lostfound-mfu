@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:lost_found_mfu/components/common/google_sign_up_button.dart';
 import 'package:lost_found_mfu/components/custom_button.dart';
 import 'package:lost_found_mfu/components/custom_text_field.dart';
 import 'package:lost_found_mfu/helpers/user_api_helper.dart';
 import 'package:lost_found_mfu/ui/screens/auth/login.dart';
+import 'package:lost_found_mfu/ui/screens/home.dart';
 
 class Signup extends StatefulWidget {
   const Signup({super.key});
@@ -147,9 +147,27 @@ class _SignupState extends State<Signup> {
                                 onPressed: _handleSignup,
                               ),
                               const SizedBox(height: 20),
-                              const Divider(thickness: 1, color: Colors.grey),
+                              Row(
+                                children: [
+                                  Expanded(
+                                      child: Divider(
+                                    thickness: 1,
+                                    color: Colors.grey,
+                                  )),
+                                  Padding(
+                                    padding:
+                                        EdgeInsets.symmetric(horizontal: 10),
+                                    child: Text("Or"),
+                                  ),
+                                  Expanded(
+                                      child: Divider(
+                                    thickness: 1,
+                                    color: Colors.grey,
+                                  )),
+                                ],
+                              ),
                               const SizedBox(height: 20),
-                              GoogleSignUpButton(),
+                              _buildGoogleSignupButton(),
                               const SizedBox(height: 20),
                             ],
                           ),
@@ -238,5 +256,46 @@ class _SignupState extends State<Signup> {
             context, MaterialPageRoute(builder: (context) => const Login()));
       }
     }
+  }
+
+  Widget _buildGoogleSignupButton() {
+    return SizedBox(
+      width: 300,
+      height: 50,
+      child: ElevatedButton(
+        style: ElevatedButton.styleFrom(
+          backgroundColor: Colors.white,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(10),
+            side: BorderSide(color: Colors.grey),
+          ),
+        ),
+        onPressed: () async {
+          final response = await UserApiHelper.signInWithGoogle();
+          if (response.containsKey('error')) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text(response['error'].toString())),
+            );
+          } else {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text('Google Sign-In Successful')),
+            );
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(builder: (context) => const Home()),
+            );
+          }
+        },
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Image.asset("assets/icons/GoogleLogo.png", width: 30, height: 30),
+            SizedBox(width: 10),
+            Text("Continue with Google",
+                style: TextStyle(color: Colors.black, fontSize: 16)),
+          ],
+        ),
+      ),
+    );
   }
 }
