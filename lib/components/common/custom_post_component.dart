@@ -140,32 +140,6 @@ class UserInfoRow extends StatelessWidget {
                 ),
               ),
             ),
-            // PopupMenuButton<String>(
-            //   onSelected: handleMenuSelection,
-            //   icon: const Icon(Icons.more_vert),
-            //   itemBuilder: (context) => [
-            //     const PopupMenuItem(
-            //       value: 'resolve',
-            //       child: Row(
-            //         children: [
-            //           Text('Resolve', style: TextStyle(color: Colors.green)),
-            //           SizedBox(width: 8),
-            //           Icon(Icons.done_all, color: Colors.green),
-            //         ],
-            //       ),
-            //     ),
-            //     const PopupMenuItem(
-            //       value: 'delete',
-            //       child: Row(
-            //         children: [
-            //           Text("Delete", style: TextStyle(color: Colors.red)),
-            //           SizedBox(width: 8),
-            //           Icon(Icons.delete, color: Colors.red),
-            //         ],
-            //       ),
-            //     ),
-            //   ],
-            // ),
           ],
         )
       ],

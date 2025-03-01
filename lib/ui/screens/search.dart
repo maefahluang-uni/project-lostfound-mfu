@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:lost_found_mfu/components/common/custom_appbar.dart';
 import 'package:lost_found_mfu/helpers/post_api_helper.dart';
+import 'package:lost_found_mfu/ui/screens/detail.dart';
 
 class Search extends StatefulWidget {
   const Search({super.key});
@@ -77,7 +78,7 @@ class _SearchState extends State<Search> {
       child: _isLoading
           ? const Center(child: CircularProgressIndicator())
           : _searchResults.isEmpty
-              ? const SizedBox() // Show nothing if no results
+              ? const SizedBox()
               : ListView.builder(
                   itemCount: _searchResults.length,
                   itemBuilder: (context, index) {
@@ -93,7 +94,11 @@ class _SearchState extends State<Search> {
                         trailing: const Icon(Icons.arrow_forward,
                             color: Colors.black),
                         onTap: () {
-                          // Navigate to detail page if needed
+                          Navigator.pushReplacement(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) =>
+                                      DetailScreen(postId: item['id'])));
                         },
                       ),
                     );

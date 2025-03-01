@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "602658360901",
+    "project_id": "lost-and-found-in-mfu-service",
+    "storage_bucket": "lost-and-found-in-mfu-service.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:602658360901:android:e398741ce4430a93681d2c",
+        "android_client_info": {
+          "package_name": "com.example.lost_found_mfu"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "602658360901-ne0pcr8231fjvrai14isfj43la79bsp5.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDzeSaTNogrOO27AxwrZbV7GckO7KiZrFA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "602658360901-ne0pcr8231fjvrai14isfj43la79bsp5.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
