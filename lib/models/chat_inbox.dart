@@ -1,14 +1,14 @@
 class ChatInbox {
   String? id;
-  SenderProfile? senderProfile;
+  ChatProfile? chatProfile;
   List<ChatRoomMessages>? chatRoomMessages;
 
-  ChatInbox({this.id, this.senderProfile, this.chatRoomMessages});
+  ChatInbox({this.id, this.chatProfile, this.chatRoomMessages});
 
   ChatInbox.fromJson(Map<String, dynamic> json) {
     id = json['id'];
-    senderProfile = json['senderProfile'] != null
-        ? new SenderProfile.fromJson(json['senderProfile'])
+    chatProfile = json['chatProfile'] != null
+        ? new ChatProfile.fromJson(json['chatProfile'])
         : null;
     if (json['chatRoomMessages'] != null) {
       chatRoomMessages = <ChatRoomMessages>[];
@@ -21,8 +21,8 @@ class ChatInbox {
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = new Map<String, dynamic>();
     data['id'] = this.id;
-    if (this.senderProfile != null) {
-      data['senderProfile'] = this.senderProfile!.toJson();
+    if (this.chatProfile != null) {
+      data['chatProfile'] = this.chatProfile!.toJson();
     }
     if (this.chatRoomMessages != null) {
       data['chatRoomMessages'] =
@@ -32,13 +32,13 @@ class ChatInbox {
   }
 }
 
-class SenderProfile {
+class ChatProfile {
   String? email;
   String? fullName;
 
-  SenderProfile({this.email, this.fullName});
+  ChatProfile({this.email, this.fullName});
 
-  SenderProfile.fromJson(Map<String, dynamic> json) {
+  ChatProfile.fromJson(Map<String, dynamic> json) {
     email = json['email'];
     fullName = json['fullName'];
   }

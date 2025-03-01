@@ -2,44 +2,44 @@ import 'package:socket_io_client/socket_io_client.dart' as IO;
 
 class SocketService {
   static final SocketService _instance = SocketService._internal();
-  late IO.Socket socket;
+  late IO.Socket _socket;
 
-  factory SocketService() => _instance;
+  factory SocketService() {
+    return _instance;
+  }
 
   SocketService._internal();
 
-  void initSocket() {
-    socket = IO.io('ws://10.0.2.2:3001', <String, dynamic>{
-      'transports': ['websocket'],
-      'autoConnect': false, 
-      'reconnection': true,
-      'reconnectionAttempts': 5,
-      'reconnectionDelay': 2000,
-    });
-    socket.connect();
-    socket.onConnect((_) {
-      print('Connected to WebSocket Server');
+  Future<void> initSocket() async {
+    _socket = IO.io("ws://10.0.2.2:3001", <String, dynamic>{
+      "transports": ["websocket"],
+      "autoConnect": false, 
     });
 
-    socket.onDisconnect((_) {
-      print('Disconnected from WebSocket Server');
+    _socket.connect();
+    _socket.onConnect((_) {
+      print("Socket Connected");
     });
 
-    socket.onConnectError((err) {
-      print('Connection Error: $err');
-    });
-
-    socket.onError((err) {
-      print('Socket Error: $err');
+    _socket.onDisconnect((_) {
+      print("Socket Disconnected");
     });
   }
 
-  void connect() => socket.connect();
-  void disconnect() => socket.disconnect();
-  void joinRoom(String roomId){
-    socket.emit('join_room', {
-      "data": {"chatRoomId": roomId}
+  void joinRoom(String chatRoomId) {
+    _socket.emit('join_room', {
+      "data": {"chatRoomId": chatRoomId}
+    });
+    print("Joined room: $chatRoomId");
+  }
+
+  void listenForRefresh(Function(String) onRefresh) {
+    _socket.on("refresh", (data) {
+      print("Refresh received for room: $data");
+      onRefresh(data);
     });
   }
-  IO.Socket getSocket() => socket;
+    void disconnect() {
+    _socket.disconnect();
+  }
 }

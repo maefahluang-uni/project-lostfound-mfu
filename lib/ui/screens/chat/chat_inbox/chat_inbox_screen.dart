@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:jiffy/jiffy.dart';
+import 'package:lost_found_mfu/services/socket_service.dart';
 import 'package:lost_found_mfu/components/chat/chat_inbox/chat_bubble.dart';
 import 'package:lost_found_mfu/components/chat/chat_inbox/chat_input.dart';
 import 'package:lost_found_mfu/components/common/custom_appbar.dart';
@@ -24,11 +25,20 @@ class _ChatInboxScreenState extends State<ChatInboxScreen> {
   bool isLoading = true;
   String? errorMessage;
   String? currentUserId;
+  final ScrollController _scrollController = ScrollController(); 
+  late SocketService socketService;
 
   @override
   void initState() {
     super.initState();
     initUserData();
+    socketService = SocketService();
+    socketService.listenForRefresh((roomId) {
+      if (roomId == widget.chatRoomId) {
+        print("Refresh received, fetching chat room...");
+        fetchChatRoom();
+      }
+    });
   }
 
   Future<void> initUserData() async {
@@ -36,16 +46,23 @@ class _ChatInboxScreenState extends State<ChatInboxScreen> {
     setState(() {
       currentUserId = prefs.getString('userId');
     });
-    fetchChatRooms();
+    fetchChatRoom();
   }
 
-  Future<void> fetchChatRooms() async {
+  Future<void> fetchChatRoom() async {
     try {
       ChatInbox? fetchedRoom = await ChatApiHelper.getChatRoom(widget.chatRoomId);
       setState(() {
         chatRoom = fetchedRoom;
         isLoading = false;
       });
+
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (_scrollController.hasClients) {
+          _scrollController.jumpTo(_scrollController.position.maxScrollExtent);
+        }
+      });
+
     } catch (error) {
       setState(() {
         errorMessage = "Error fetching chat rooms: $error";
@@ -54,17 +71,35 @@ class _ChatInboxScreenState extends State<ChatInboxScreen> {
     }
   }
 
+  Future<void> sendMessage(String messageType, String messageContent) async {
+    if (messageContent.trim().isEmpty) return;
+
+    await ChatApiHelper.sendChatMessage(
+      messageType: messageType,
+      message: messageContent,
+      receiverId: "u8uM3H04DQWbUEnY23KlnG1rID83",
+      senderId: "Vd7rq7BEgaPhifXmTBJ7SwSO2Rk1",
+      chatRoomId: widget.chatRoomId,
+    );
+
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (_scrollController.hasClients) {
+          _scrollController.jumpTo(_scrollController.position.maxScrollExtent);
+        }
+      });
+    }
+  
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: CustomAppbar(
-        appBarTitle: chatRoom?.senderProfile?.fullName ?? "Chat",
+        appBarTitle: chatRoom?.chatProfile?.fullName ?? "Chat",
         hasBackArrow: true,
       ),
       body: Column(
         children: [
-
           Expanded(
             child: Container(
               width: double.infinity,
@@ -74,11 +109,12 @@ class _ChatInboxScreenState extends State<ChatInboxScreen> {
                   : (chatRoom?.chatRoomMessages?.isEmpty ?? true)
                       ? const Center(child: Text("No messages yet")) 
                       : ListView.builder(
+                          controller: _scrollController, 
                           padding: const EdgeInsets.symmetric(horizontal: 25),
                           itemCount: chatRoom?.chatRoomMessages?.length ?? 0, 
                           itemBuilder: (context, index) {
                             final message = chatRoom!.chatRoomMessages![index];
-                            bool isSelf = message.senderId == currentUserId; 
+                            bool isSelf = message.senderId == "Vd7rq7BEgaPhifXmTBJ7SwSO2Rk1"; 
                             String messageDate = Jiffy.parse(message.createdAt!).format(pattern: 'dd MMM yyyy');
                             String? previousMessageDate = index > 0
                                 ? Jiffy.parse(chatRoom!.chatRoomMessages![index - 1].createdAt!).format(pattern: 'dd MMM yyyy')
@@ -130,10 +166,14 @@ class _ChatInboxScreenState extends State<ChatInboxScreen> {
               ),
             ),
             child: ChatInput(
+              onSendMessage: (String message) {
+                sendMessage("TEXT", message);
+              },
               onImagePicked: (XFile? selectedImage) {
                 setState(() {
                   _selectedImage = selectedImage;
                 });
+                sendMessage("IMAGE", selectedImage!.path);
               },
             ),
           ),

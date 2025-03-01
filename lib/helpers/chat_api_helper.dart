@@ -75,4 +75,44 @@ class ChatApiHelper {
       return null;
     }
   }
+
+    static Future<Map<String, dynamic>?> sendChatMessage({
+    required String messageType,
+    required String message,
+    required String receiverId,
+    required String chatRoomId,
+    required String senderId
+  }) async {
+    try {
+      String? token = await getToken();
+      if (token == null) {
+        print("User not authenticated");
+        return null;
+      }
+
+      final response = await http.post(
+        Uri.parse('$baseUrl/chats/send_message'),
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $token',
+        },
+        body: jsonEncode({
+          "messageType": messageType,
+          "message": message,
+          "senderId": senderId,
+          "receiverId": receiverId,
+          "chatRoomId": chatRoomId,
+        }),
+      );
+
+      if (response.statusCode == 200) {
+        return jsonDecode(response.body); 
+      } else {
+        throw Exception("Failed to send message: ${response.body}");
+      }
+    } catch (error) {
+      print("❌ Error sending message: $error");
+      return null;
+    }
+  }
 }

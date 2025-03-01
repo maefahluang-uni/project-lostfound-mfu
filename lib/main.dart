@@ -16,16 +16,21 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  SocketService().initSocket();
+  final socketService = SocketService();
+  await socketService.initSocket();
   List<ChatRoom> chatRooms = await ChatApiHelper.getChatRooms();
-  chatRooms.forEach((room) {
-    if (room.id != null) {
-      SocketService().joinRoom(room.id!);
-    }
-  });
+  joinAllChatRooms(chatRooms, socketService);
   String initialRoute = await getInitialRoute();
 
   runApp(MyApp(initialRoute: initialRoute));
+}
+
+void joinAllChatRooms(List<ChatRoom> chatRooms, SocketService socketService) {
+  for (ChatRoom room in chatRooms) {
+    if (room.id != null) {
+      socketService.joinRoom(room.id!);
+    }
+  }
 }
 
 Future<String> getInitialRoute() async {

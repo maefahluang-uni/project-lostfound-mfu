@@ -5,7 +5,6 @@ import 'package:lost_found_mfu/components/common/custom_appbar.dart';
 import 'package:lost_found_mfu/components/custom_text_field.dart';
 import 'package:lost_found_mfu/helpers/chat_api_helper.dart';
 import 'package:lost_found_mfu/models/chat.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 class ChatScreen extends StatefulWidget {
   const ChatScreen({super.key});
