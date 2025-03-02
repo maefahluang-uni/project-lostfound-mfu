@@ -7,13 +7,13 @@ class ChatBar extends StatelessWidget {
       {super.key,
       required this.chatOwner,
       required this.messagePreview,
-      required this.messageCount,
+      this.messageCount,
       required this.messageTime,
       required this.chatRoomId,
       });
   final String chatOwner;
   final String messagePreview;
-  final String messageCount;
+  final int? messageCount;
   final String messageTime;
   final String chatRoomId;
   @override
@@ -72,19 +72,19 @@ class ChatBar extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.center,
                 spacing: 4,
                 children: [
-                  Container(
+                  messageCount! > 0 ? Container(
                     alignment: Alignment.center,
                     width: 24,
                     height: 24,
                     decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(100),
                         color: AppColor.theme.primaryColor),
-                    child: Text(messageCount,
+                    child: Text(messageCount.toString(),
                         style: TextStyle(
                             color: Colors.white,
                             fontSize: 14,
-                            fontWeight: FontWeight.bold)),
-                  ),
+                            fontWeight: FontWeight.bold)) ,
+                  ) : SizedBox(),
                   Text(messageTime,
                       style: TextStyle(
                           color: AppColor.theme.hintColor,

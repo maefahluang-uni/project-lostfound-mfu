@@ -22,12 +22,11 @@ class ChatInboxScreen extends StatefulWidget {
 class _ChatInboxScreenState extends State<ChatInboxScreen> {
   XFile? _selectedImage;
   ChatInbox? chatRoom;
-  bool isLoading = true;
+  bool isLoading = false;
   String? errorMessage;
   String? currentUserId;
   final ScrollController _scrollController = ScrollController(); 
   late SocketService socketService;
-
   @override
   void initState() {
     super.initState();
@@ -56,12 +55,8 @@ class _ChatInboxScreenState extends State<ChatInboxScreen> {
         chatRoom = fetchedRoom;
         isLoading = false;
       });
-
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        if (_scrollController.hasClients) {
-          _scrollController.jumpTo(_scrollController.position.maxScrollExtent);
-        }
-      });
+      await ChatApiHelper.readChatRoom(widget.chatRoomId);
+      WidgetsBinding.instance.addPostFrameCallback((_) => scrollToBottom());
 
     } catch (error) {
       setState(() {
@@ -77,8 +72,8 @@ class _ChatInboxScreenState extends State<ChatInboxScreen> {
     await ChatApiHelper.sendChatMessage(
       messageType: messageType,
       message: messageContent,
-      receiverId: "u8uM3H04DQWbUEnY23KlnG1rID83",
-      senderId: "Vd7rq7BEgaPhifXmTBJ7SwSO2Rk1",
+      receiverId: chatRoom?.chatProfile?.id ?? '',
+      senderId: currentUserId!,
       chatRoomId: widget.chatRoomId,
     );
 
@@ -89,6 +84,15 @@ class _ChatInboxScreenState extends State<ChatInboxScreen> {
       });
     }
   
+  void scrollToBottom() {
+    if (_scrollController.hasClients) {
+      _scrollController.animateTo(
+        _scrollController.position.maxScrollExtent,
+        duration: const Duration(milliseconds: 300),
+        curve: Curves.easeOut,
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -114,7 +118,7 @@ class _ChatInboxScreenState extends State<ChatInboxScreen> {
                           itemCount: chatRoom?.chatRoomMessages?.length ?? 0, 
                           itemBuilder: (context, index) {
                             final message = chatRoom!.chatRoomMessages![index];
-                            bool isSelf = message.senderId == "Vd7rq7BEgaPhifXmTBJ7SwSO2Rk1"; 
+                            bool isSelf = message.senderId == currentUserId; 
                             String messageDate = Jiffy.parse(message.createdAt!).format(pattern: 'dd MMM yyyy');
                             String? previousMessageDate = index > 0
                                 ? Jiffy.parse(chatRoom!.chatRoomMessages![index - 1].createdAt!).format(pattern: 'dd MMM yyyy')

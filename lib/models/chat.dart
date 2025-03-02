@@ -1,19 +1,27 @@
 class ChatRoom {
   String? id;
   LastMessage? lastMessage;
+  int? unreadCount;
   ChatProfile? chatProfile;
   String? user1Id;
   String? user2Id;
   Timestamp? timestamp;
 
   ChatRoom(
-      {this.id, this.lastMessage, this.chatProfile, this.user1Id, this.user2Id, this.timestamp});
+      {this.id,
+      this.lastMessage,
+      this.unreadCount,
+      this.chatProfile,
+      this.user1Id,
+      this.user2Id,
+      this.timestamp});
 
   ChatRoom.fromJson(Map<String, dynamic> json) {
     id = json['id'];
     lastMessage = json['lastMessage'] != null
         ? new LastMessage.fromJson(json['lastMessage'])
         : null;
+    unreadCount = json['unread_count'];
     chatProfile = json['chatProfile'] != null
         ? new ChatProfile.fromJson(json['chatProfile'])
         : null;
@@ -30,6 +38,7 @@ class ChatRoom {
     if (this.lastMessage != null) {
       data['lastMessage'] = this.lastMessage!.toJson();
     }
+    data['unread_count'] = this.unreadCount;
     if (this.chatProfile != null) {
       data['chatProfile'] = this.chatProfile!.toJson();
     }
@@ -47,7 +56,7 @@ class LastMessage {
   String? content;
   String? createdAt;
 
-  LastMessage({this.messageType, this.content});
+  LastMessage({this.messageType, this.content, this.createdAt});
 
   LastMessage.fromJson(Map<String, dynamic> json) {
     messageType = json['messageType'];

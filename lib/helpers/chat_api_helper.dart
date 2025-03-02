@@ -20,16 +20,18 @@ class ChatApiHelper {
     };
   }
 
-  static Future<List<ChatRoom>> getChatRooms() async {
+  static Future<List<ChatRoom>> getChatRooms({String? searchQuery}) async {
       String? token = await getToken();
       if (token == null) {
         print("User not authenticated");
         return [];
       }
       try{
-        final response = await http.get(
-          Uri.parse('$baseUrl/chats/get_chats'),
-          headers: _headers(token: token));
+        final uri = Uri.parse("$baseUrl/chats/get_chats").replace(queryParameters: {
+          if (searchQuery != null && searchQuery.isNotEmpty) "searchQuery": searchQuery,
+        });
+
+        final response = await http.get(uri, headers: _headers(token: token));
         if (response.statusCode == 200) {
           List<dynamic> jsonData = jsonDecode(response.body);
           List<ChatRoom> chatRooms = jsonData.map((json) => ChatRoom.fromJson(json)).toList();
@@ -115,4 +117,28 @@ class ChatApiHelper {
       return null;
     }
   }
-}
+
+  static Future<void> readChatRoom(String chatRoomId) async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    final String? token = prefs.getString('token');
+
+    if (token == null) {
+      print("User not authenticated");
+      return;
+    }
+
+    try {
+      final response = await http.get(
+        Uri.parse("$baseUrl/chats/read_chat_room/$chatRoomId"),
+        headers: {"Authorization": "Bearer $token"},
+      );
+
+      if (response.statusCode == 200) {
+        print("Messages marked as read in chat room: $chatRoomId");
+      } else {
+        print("Failed to mark messages as read. Status: ${response.statusCode}");
+      }
+    } catch (error) {
+      print("Error marking messages as read: $error");
+    }
+  }}
