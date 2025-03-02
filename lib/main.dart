@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:lost_found_mfu/services/socket_service.dart';
 import 'package:lost_found_mfu/ui/screens/notification_screen.dart';
 import 'package:lost_found_mfu/ui/screens/profile.dart';
 import 'package:lost_found_mfu/ui/screens/search.dart';
@@ -14,8 +15,11 @@ import 'package:firebase_core/firebase_core.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  final socketService = SocketService();
+  await socketService.initSocket();
+  String initialRoute = await getInitialRoute();
+
   await Firebase.initializeApp();
-  final String initialRoute = await getInitialRoute();
   runApp(MyApp(initialRoute: initialRoute));
 }
 

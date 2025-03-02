@@ -5,7 +5,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
 class UserApiHelper {
-  static final String? baseUrl = 'http://localhost:3001/api';
+  static final String? baseUrl = 'http://10.0.2.2:3001/api';
   final GoogleSignIn _googleSignIn = GoogleSignIn(
     scopes: <String>['email'],
   );
