@@ -1,9 +1,14 @@
 import 'dart:convert';
+import 'package:google_sign_in/google_sign_in.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class UserApiHelper {
   static final String? baseUrl = 'http://10.0.2.2:3001/api';
+  final GoogleSignIn _googleSignIn = GoogleSignIn(
+    scopes: <String>['email'],
+  );
 
   // Get token from shared preferences
   static Future<String?> getToken() async {
@@ -141,7 +146,8 @@ class UserApiHelper {
           'bio': (data['bio'] != null && data['bio'].isNotEmpty)
               ? data['bio']
               : 'Write Your Bio',
-          'profileImage': data['profileImage'] ?? 'assets/images/user.jpeg'
+          'profileImage': data['profileImage'] ?? 'assets/images/user.jpeg',
+          'posts': data['posts'] ?? []
         };
       } else {
         print("Failed to fetch profile data: ${response.body}");
@@ -180,6 +186,67 @@ class UserApiHelper {
     } catch (e) {
       print("Error fetching profile data: $e");
       return {};
+    }
+  }
+
+  static Future<bool> deleteUser() async {
+    String? token = await getToken();
+    String? userId = await getUserId();
+
+    try {
+      final response = await http.delete(
+          Uri.parse("$baseUrl/users/user/$userId"),
+          headers: _headers(token: token));
+      if (response.statusCode == 200) {
+        print(response.body);
+        return json.decode(response.body);
+      } else {
+        print('Failed to delete account: ${response.statusCode}');
+        return false;
+      }
+    } catch (e) {
+      print("Error deleting account: $e");
+      return true;
+    }
+  }
+
+  static Future<Map<String, dynamic>> signInWithGoogle() async {
+    try {
+      final GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
+      if (googleUser == null) return {'error': 'Google sign-in failed'};
+
+      final GoogleSignInAuthentication googleAuth =
+          await googleUser.authentication;
+      final idToken = googleAuth.idToken;
+
+      if (idToken == null) throw Exception("Failed to get idToken");
+
+      final response = await http.post(
+        Uri.parse("$baseUrl/users/google-signin"),
+        body: jsonEncode({"idToken": idToken}),
+      );
+
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        return data['token'];
+      } else {
+        return {'error': "Failed to authenticate: ${response.body}"};
+      }
+    } catch (e) {
+      print("Error signing in with Google: $e");
+      return {'error': "Error signing in with Google: $e"};
+    }
+  }
+
+  static Future<UserCredential?> authenticateWithFirebase(
+      String customToken) async {
+    try {
+      final UserCredential userCredential =
+          await FirebaseAuth.instance.signInWithCustomToken(customToken);
+      return userCredential;
+    } catch (e) {
+      print("Firebase Authentication Error: $e");
+      return null;
     }
   }
 }

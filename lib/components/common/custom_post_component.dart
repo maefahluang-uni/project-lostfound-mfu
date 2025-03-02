@@ -3,15 +3,35 @@ import 'package:lost_found_mfu/components/common/copy_link.dart';
 import 'package:lost_found_mfu/ui/screens/detail.dart';
 import 'package:lost_found_mfu/ui/theme/app_color.dart';
 
-class CustomPostComponent extends StatelessWidget {
+class CustomPostComponent extends StatefulWidget {
   final Map<String, dynamic> postData;
 
   const CustomPostComponent({super.key, required this.postData});
 
+  @override
+  _CustomPostComponentState createState() => _CustomPostComponentState();
+}
+
+class _CustomPostComponentState extends State<CustomPostComponent> {
+  late Map<String, dynamic> postData;
+
+  @override
+  void initState() {
+    super.initState();
+    postData = widget.postData;
+  }
+
   void handleMenuSelection(String value) {
     if (value == 'resolve') {
+      setState(() {
+        postData['itemStatus'] = 'Resolved'; // Update the UI immediately
+      });
       print("Resolve clicked");
     } else if (value == 'delete') {
+      setState(() {
+        postData['itemStatus'] =
+            'Deleted'; // Handle delete, remove post if necessary
+      });
       print("Delete clicked");
     }
   }
@@ -23,7 +43,9 @@ class CustomPostComponent extends StatelessWidget {
       child: Column(
         children: [
           UserInfoRow(
-              postData: postData, handleMenuSelection: handleMenuSelection),
+            postData: postData,
+            handleMenuSelection: handleMenuSelection,
+          ),
           const SizedBox(height: 10),
           PostImage(postData: postData),
           const SizedBox(height: 10),
@@ -99,49 +121,24 @@ class UserInfoRow extends StatelessWidget {
         Row(
           children: [
             IconButton(
-                onPressed: () {},
-                icon: SizedBox(
-                  width: 50,
-                  height: 25,
-                  child: Badge(
-                    label: Padding(
-                      padding: const EdgeInsets.all(4.0),
-                      child: Text(
-                        postData['itemStatus'],
-                        style: TextStyle(
-                            fontSize: 10, fontWeight: FontWeight.bold),
-                      ),
+              onPressed: () {},
+              icon: SizedBox(
+                width: 50,
+                height: 25,
+                child: Badge(
+                  label: Padding(
+                    padding: const EdgeInsets.all(4.0),
+                    child: Text(
+                      postData['itemStatus'],
+                      style:
+                          TextStyle(fontSize: 10, fontWeight: FontWeight.bold),
                     ),
-                    backgroundColor: postData['itemStatus'] == 'Lost'
-                        ? Colors.redAccent
-                        : Colors.green,
                   ),
-                )),
-            PopupMenuButton<String>(
-              onSelected: handleMenuSelection,
-              icon: const Icon(Icons.more_vert),
-              itemBuilder: (context) => [
-                const PopupMenuItem(
-                  value: 'resolve',
-                  child: Row(
-                    children: [
-                      Text('Resolve', style: TextStyle(color: Colors.green)),
-                      SizedBox(width: 8),
-                      Icon(Icons.done_all, color: Colors.green),
-                    ],
-                  ),
+                  backgroundColor: postData['itemStatus'] == 'Lost'
+                      ? Colors.redAccent
+                      : Colors.green,
                 ),
-                const PopupMenuItem(
-                  value: 'delete',
-                  child: Row(
-                    children: [
-                      Text("Delete", style: TextStyle(color: Colors.red)),
-                      SizedBox(width: 8),
-                      Icon(Icons.delete, color: Colors.red),
-                    ],
-                  ),
-                ),
-              ],
+              ),
             ),
           ],
         )
@@ -197,21 +194,34 @@ class PostActions extends StatelessWidget {
           const SizedBox(width: 8),
           const Text("Message", style: TextStyle(color: Colors.red)),
           const SizedBox(width: 20),
-          CopyLink(),
+          CopyLink(postId: id),
           const SizedBox(width: 8),
           Row(
             children: [
-              IconButton(
-                  onPressed: () {
-                    Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => DetailScreen(postId: id)));
-                  },
-                  iconSize: 20,
-                  padding: EdgeInsets.zero,
-                  icon: Icon(Icons.remove_red_eye_outlined, color: Colors.red)),
-              Text("View Detail", style: TextStyle(color: Colors.red)),
+              InkWell(
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => DetailScreen(postId: id),
+                    ),
+                  );
+                },
+                child: Row(
+                  children: [
+                    Icon(
+                      Icons.remove_red_eye_outlined,
+                      color: Colors.red,
+                      size: 20,
+                    ),
+                    const SizedBox(width: 8),
+                    Text(
+                      "View Detail",
+                      style: TextStyle(color: Colors.red),
+                    ),
+                  ],
+                ),
+              )
             ],
           ),
         ],

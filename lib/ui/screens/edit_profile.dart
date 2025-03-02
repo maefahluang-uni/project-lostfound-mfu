@@ -3,6 +3,7 @@ import 'package:lost_found_mfu/components/common/custom_appbar.dart';
 import 'package:lost_found_mfu/components/custom_button.dart';
 import 'package:lost_found_mfu/components/custom_text_field.dart';
 import 'package:lost_found_mfu/helpers/user_api_helper.dart';
+import 'package:lost_found_mfu/ui/screens/home.dart';
 import 'package:lost_found_mfu/ui/screens/profile.dart';
 import 'package:lost_found_mfu/ui/theme/app_color.dart';
 
@@ -51,7 +52,7 @@ class _EditProfileState extends State<EditProfile> {
           SnackBar(content: Text('Profile updated successfully')));
       await _loadUserProfile();
       Navigator.pushReplacement(
-          context, MaterialPageRoute(builder: (context) => Profile()));
+          context, MaterialPageRoute(builder: (context) => Home()));
     } else {
       ScaffoldMessenger.of(context)
           .showSnackBar(SnackBar(content: Text('Falied to update profile')));

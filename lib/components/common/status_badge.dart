@@ -7,11 +7,9 @@ class StatusBadge extends StatelessWidget {
 
   Color _getBackgroundColor() {
     switch (status) {
-      case 'Published':
+      case 'Found':
         return Colors.green;
-      case 'Pending':
-        return Colors.orange;
-      case 'Rejected':
+      case 'Lost':
         return Colors.red;
       default:
         return Colors.grey;

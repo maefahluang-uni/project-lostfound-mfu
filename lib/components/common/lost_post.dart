@@ -20,7 +20,8 @@ class _LostPostState extends State<LostPost> {
   }
 
   Future<List<Map<String, dynamic>>> fetchLostPosts() async {
-    List<Map<String, dynamic>> data = await PostApiHelper.getPosts("Lost");
+    List<Map<String, dynamic>> data =
+        await PostApiHelper.getPosts(itemStatus: "Lost");
 
     return data;
   }

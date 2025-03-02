@@ -11,6 +11,7 @@ import 'package:lost_found_mfu/ui/screens/auth/login.dart';
 import 'package:lost_found_mfu/ui/screens/setting/setting.dart';
 import 'package:lost_found_mfu/ui/screens/auth/signup.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:firebase_core/firebase_core.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -18,6 +19,7 @@ void main() async {
   await socketService.initSocket();
   String initialRoute = await getInitialRoute();
 
+  await Firebase.initializeApp();
   runApp(MyApp(initialRoute: initialRoute));
 }
 

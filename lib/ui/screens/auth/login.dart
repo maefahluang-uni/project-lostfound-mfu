@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:lost_found_mfu/components/custom_button.dart';
 import 'package:lost_found_mfu/components/custom_text_field.dart';
 import 'package:lost_found_mfu/helpers/user_api_helper.dart';
@@ -87,38 +88,37 @@ class _LoginState extends State<Login> {
                           key: _formKey,
                           child: Column(
                             children: [
-                              CustomTextField(
+                              _buildTextField(
                                 controller: _emailController,
                                 label: "Email",
-                                suffixIcon: Icons.email,
+                                icon: Icons.email,
                                 validator: (value) {
-                                  if (value == null || value.isEmpty) {
+                                  if (value == null || value.isEmpty)
                                     return "Email can't be empty";
-                                  }
-                                  // final emailRegex = RegExp(
-                                  //     r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}\$');
-                                  // if (!emailRegex.hasMatch(value)) {
-                                  //   return "Enter a valid email";
-                                  // }
-                                  return null;
+                                  final emailRegex = RegExp(
+                                      r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$');
+                                  return emailRegex.hasMatch(value)
+                                      ? null
+                                      : "Enter a valid email";
                                 },
+                                textCapitalization: TextCapitalization.none,
+                                keyboardType: TextInputType.emailAddress,
                               ),
-                              SizedBox(height: 20),
-                              CustomTextField(
+                              SizedBox(height: 10),
+                              _buildTextField(
                                 controller: _passwordController,
                                 label: "Password",
-                                suffixIcon: Icons.visibility,
+                                icon: Icons.lock,
+                                obscureText: true,
                                 validator: (value) {
-                                  if (value == null || value.isEmpty) {
+                                  if (value == null || value.isEmpty)
                                     return "Password can't be empty";
-                                  }
-                                  if (value.length < 6) {
-                                    return "Password must be at least 6 characters long";
-                                  }
-                                  return null;
+                                  return value.length < 6
+                                      ? "Password must be at least 6 characters"
+                                      : null;
                                 },
                               ),
-                              SizedBox(height: 20),
+                              SizedBox(height: 10),
                               CustomButton(
                                   text: "Login",
                                   onPressed: () async {
@@ -184,6 +184,55 @@ class _LoginState extends State<Login> {
     );
   }
 
+  Widget _buildTextField({
+    required TextEditingController controller,
+    required String label,
+    required IconData icon,
+    String? Function(String?)? validator,
+    bool obscureText = false,
+    List<TextInputFormatter>? inputFormatters,
+    TextCapitalization? textCapitalization,
+    TextInputType? keyboardType,
+  }) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        StatefulBuilder(
+          builder: (context, setState) {
+            String? errorText;
+
+            return Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                CustomTextField(
+                  controller: controller,
+                  label: label,
+                  suffixIcon: icon,
+                  obscureText: obscureText,
+                  inputFormatters: inputFormatters,
+                  onChanged: (value) {
+                    setState(() {
+                      errorText = validator?.call(value);
+                    });
+                  },
+                ),
+                if (errorText != null)
+                  Padding(
+                    padding: const EdgeInsets.only(top: 5, left: 8),
+                    child: Text(
+                      errorText!,
+                      style: const TextStyle(color: Colors.red, fontSize: 12),
+                    ),
+                  ),
+              ],
+            );
+          },
+        ),
+        const SizedBox(height: 20),
+      ],
+    );
+  }
+
   Widget _buildGoogleLoginButton() {
     return SizedBox(
       width: 300,
@@ -196,7 +245,22 @@ class _LoginState extends State<Login> {
             side: BorderSide(color: Colors.grey),
           ),
         ),
-        onPressed: () {},
+        onPressed: () async {
+          final response = await UserApiHelper.signInWithGoogle();
+          if (response.containsKey('error')) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text(response['error'].toString())),
+            );
+          } else {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text('Google Sign-In Successful')),
+            );
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(builder: (context) => const Home()),
+            );
+          }
+        },
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
