@@ -79,9 +79,7 @@ class _DetailScreenState extends State<DetailScreen> {
                                 CircleAvatar(
                                   radius: 20,
                                   backgroundImage:
-                                      item!.post.postOwner.photoURL != null &&
-                                              item!.post.postOwner.photoURL
-                                                  .isNotEmpty
+                                      item!.post.postOwner.photoURL.isNotEmpty
                                           ? NetworkImage(item!.post.postOwner
                                               .photoURL) // Online image
                                           : const AssetImage(
@@ -152,27 +150,30 @@ class _DetailScreenState extends State<DetailScreen> {
                                     fontWeight: FontWeight.bold)),
                             if (item!.post.photos.isNotEmpty)
                               SizedBox(
-                                height: 300,
+                                height: 340,
                                 child: ListView.builder(
                                   scrollDirection: Axis.horizontal,
                                   itemCount: item!.post.photos.length,
                                   itemBuilder: (context, index) {
-                                    return Padding(
-                                      padding: const EdgeInsets.all(8.0),
-                                      child: ClipRRect(
-                                        borderRadius: BorderRadius.circular(12),
-                                        child: Image.network(
-                                          item!.post.photos[index],
-                                          width: 450,
-                                          fit: BoxFit.cover,
-                                          errorBuilder:
-                                              (context, error, stackTrace) {
-                                            return Image.asset(
-                                              'assets/images/macbook.jpg',
-                                              width: 450,
-                                              fit: BoxFit.cover,
-                                            );
-                                          },
+                                    return Center(
+                                      child: Padding(
+                                        padding: const EdgeInsets.all(8.0),
+                                        child: ClipRRect(
+                                          borderRadius:
+                                              BorderRadius.circular(12),
+                                          child: Image.network(
+                                            item!.post.photos[index],
+                                            width: 340,
+                                            fit: BoxFit.fill,
+                                            errorBuilder:
+                                                (context, error, stackTrace) {
+                                              return Image.asset(
+                                                'assets/images/macbook.jpg',
+                                                width: 450,
+                                                fit: BoxFit.cover,
+                                              );
+                                            },
+                                          ),
                                         ),
                                       ),
                                     );

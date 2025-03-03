@@ -91,7 +91,9 @@ class _HomeState extends State<Home> {
               future: userProfile,
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
-                  return const Center(child: CircularProgressIndicator());
+                  return const CircleAvatar(
+                      radius: 18, // Size of the circle avatar
+                      backgroundImage: AssetImage("assets/images/user.jpeg"));
                 }
 
                 if (snapshot.hasError) {
@@ -103,8 +105,8 @@ class _HomeState extends State<Home> {
                 }
                 return CircleAvatar(
                     radius: 18, // Size of the circle avatar
-                    backgroundImage: AssetImage(
-                        userData['profile'] ?? "assets/images/user.jpeg"));
+                    backgroundImage: NetworkImage(
+                        userData['profileImage'] ?? "assets/images/user.jpeg"));
               },
             ),
           ),
