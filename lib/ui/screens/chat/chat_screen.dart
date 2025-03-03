@@ -28,8 +28,7 @@ class _ChatScreenState extends State<ChatScreen> {
   void initState() {
     super.initState();
     socketService = SocketService();
-    fetchChatRooms(loadingRequired: true);
-    joinAllChatRooms(chatRooms, socketService);
+  _initializeSocketAndFetchRooms();
     socketService.listenForRefresh((roomId) {
         fetchChatRooms(loadingRequired: false);
     });
@@ -64,19 +63,25 @@ class _ChatScreenState extends State<ChatScreen> {
       fetchChatRooms(searchQuery: _chatsSearchController.text.trim());
     });
   }
-
-  @override
-  void dispose() {
-    _chatsSearchController.dispose();
-    _debounce?.cancel();
-    super.dispose();
-  }
-  void joinAllChatRooms(List<ChatRoom> chatRooms, SocketService socketService) {
+  Future<void> joinAllChatRooms(List<ChatRoom> chatRooms, SocketService socketService) async{
     for (ChatRoom room in chatRooms) {
       if (room.id != null) {
         socketService.joinRoom(room.id!);
       }
     }
+  }
+  Future<void> _initializeSocketAndFetchRooms() async {
+
+    await fetchChatRooms(loadingRequired: true); 
+    print("Fetching chat rooms completed. Joining rooms...");
+
+    await joinAllChatRooms(chatRooms, socketService); 
+  }
+    @override
+  void dispose() {
+    _chatsSearchController.dispose();
+    _debounce?.cancel();
+    super.dispose();
   }
   @override
   Widget build(BuildContext context) {

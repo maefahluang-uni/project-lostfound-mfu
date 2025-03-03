@@ -51,14 +51,24 @@ class _ChatInboxScreenState extends State<ChatInboxScreen> {
   Future<void> fetchChatRoom() async {
     try {
       ChatInbox? fetchedRoom = await ChatApiHelper.getChatRoom(widget.chatRoomId);
+      
+      if (!mounted) return;
+
       setState(() {
         chatRoom = fetchedRoom;
         isLoading = false;
       });
+
       await ChatApiHelper.readChatRoom(widget.chatRoomId);
-      WidgetsBinding.instance.addPostFrameCallback((_) => scrollToBottom());
+
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) {
+          scrollToBottom();
+        }
+      });
 
     } catch (error) {
+      if (!mounted) return; 
       setState(() {
         errorMessage = "Error fetching chat rooms: $error";
         isLoading = false;
@@ -93,7 +103,15 @@ class _ChatInboxScreenState extends State<ChatInboxScreen> {
       );
     }
   }
+  @override
+  void dispose() {
 
+    socketService.listenForRefresh((roomId) {});
+
+    _scrollController.dispose();
+    
+    super.dispose();
+  }
   @override
   Widget build(BuildContext context) {
     return Scaffold(

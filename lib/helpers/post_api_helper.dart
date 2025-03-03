@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:lost_found_mfu/helpers/user_api_helper.dart';
 import 'package:path/path.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
@@ -107,7 +108,10 @@ class PostApiHelper {
             List<Map<String, dynamic>>.from(data['posts'] ?? []);
 
         return posts;
-      } else {
+      } else if(response.statusCode == 401){
+          await UserApiHelper.forceLogout();
+          return [];
+        }else {
         print("Failed to fetch posts. Status code: ${response.statusCode}");
         print("Response body: ${response.body}");
         return [];

@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:lost_found_mfu/helpers/user_api_helper.dart';
 import 'package:lost_found_mfu/models/chat.dart';
 import 'package:lost_found_mfu/models/chat_inbox.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -38,7 +39,9 @@ class ChatApiHelper {
           return chatRooms;
         }
        else {
-        print("Failed to fetch posts. Status code: ${response.statusCode}");
+        if(response.statusCode == 401){
+          await UserApiHelper.forceLogout();
+        }
         print("Response body: ${response.body}");
         return [];
       }
@@ -67,6 +70,9 @@ class ChatApiHelper {
       if (response.statusCode == 200) {
         Map<String, dynamic> jsonData = jsonDecode(response.body);
         return ChatInbox.fromJson(jsonData);
+      } else if(response.statusCode == 401){
+          await UserApiHelper.forceLogout();
+          return null;
       } else {
         print("Failed to fetch chat room. Status: ${response.statusCode}");
         print("Response: ${response.body}");
@@ -135,6 +141,8 @@ class ChatApiHelper {
 
       if (response.statusCode == 200) {
         print("Messages marked as read in chat room: $chatRoomId");
+      } else if(response.statusCode == 401){
+          await UserApiHelper.forceLogout();
       } else {
         print("Failed to mark messages as read. Status: ${response.statusCode}");
       }

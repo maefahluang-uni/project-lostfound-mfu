@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:http/http.dart' as http;
+import 'package:lost_found_mfu/main.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
@@ -248,5 +249,10 @@ class UserApiHelper {
       print("Firebase Authentication Error: $e");
       return null;
     }
+  }
+
+  static Future<void> forceLogout () async { 
+    await logout();
+    navigatorKey.currentState?.pushNamedAndRemoveUntil('/login', (route) => false);
   }
 }

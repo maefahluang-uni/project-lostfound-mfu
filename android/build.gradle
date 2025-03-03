@@ -1,10 +1,11 @@
+plugins {
+    id 'com.google.gms.google-services' version '4.3.14' apply true
+}
+
 allprojects {
     repositories {
         google()
         mavenCentral()
-    }
-    dependencies {
-        classpath 'com.google.gms:google-services:4.3.10'
     }
 }
 

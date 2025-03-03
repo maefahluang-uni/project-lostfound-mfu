@@ -22,6 +22,7 @@ void main() async {
   await Firebase.initializeApp();
   runApp(MyApp(initialRoute: initialRoute));
 }
+final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 
 Future<String> getInitialRoute() async {
   final SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -42,6 +43,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
+      navigatorKey: navigatorKey,
       title: 'Lost & Found in MFU',
       theme: ThemeData(
         textTheme: GoogleFonts.manropeTextTheme(),
