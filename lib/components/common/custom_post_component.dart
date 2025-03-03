@@ -95,11 +95,11 @@ class UserInfoRow extends StatelessWidget {
           children: [
             CircleAvatar(
               radius: 22,
-              backgroundImage: postData['userImage'] != null &&
-                      postData['userImage'].isNotEmpty
-                  ? NetworkImage(postData['userImage']) // Online image
-                  : const AssetImage("assets/images/user.jpeg")
-                      as ImageProvider,
+              backgroundImage: postData['postOwner']['profileImage'] != null &&
+                      postData['postOwner']['profileImage'].isNotEmpty
+                  ? NetworkImage(
+                      postData['postOwner']['profileImage']) // Online image
+                  : AssetImage("assets/images/user.jpeg") as ImageProvider,
             ),
             const SizedBox(width: 10),
             Column(

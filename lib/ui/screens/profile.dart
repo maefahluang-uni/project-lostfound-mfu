@@ -76,8 +76,8 @@ class _ProfileState extends State<Profile> {
                 Center(
                   child: CircleAvatar(
                     radius: 80,
-                    backgroundImage: AssetImage(
-                      userData['profile'] ?? "assets/images/user.jpeg",
+                    backgroundImage: NetworkImage(
+                      userData['profileImage'] ?? "assets/images/user.jpeg",
                     ),
                   ),
                 ),
