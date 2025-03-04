@@ -21,7 +21,7 @@ class ChatBubble extends StatelessWidget {
                     mainAxisSize: MainAxisSize.min,
                     crossAxisAlignment: CrossAxisAlignment.end,
                     children: [
-                      Text("12:39PM", style: TextStyle(fontSize: 14, color: Colors.black), textAlign: TextAlign.left,),
+                      Text(messageTime, style: TextStyle(fontSize: 14, color: Colors.black), textAlign: TextAlign.left,),
                       Container(
                         constraints: BoxConstraints(minWidth:100, maxWidth: 300),
                         decoration: BoxDecoration(
@@ -44,7 +44,7 @@ class ChatBubble extends StatelessWidget {
                     mainAxisSize: MainAxisSize.min,
                     crossAxisAlignment: CrossAxisAlignment.end,
                     children: [
-                      Text("12:39PM", style: TextStyle(fontSize: 14, color: Colors.black), textAlign: TextAlign.right,),
+                      Text(messageTime, style: TextStyle(fontSize: 14, color: Colors.black), textAlign: TextAlign.right,),
                       Container(
                         constraints: BoxConstraints(minWidth:100, maxWidth: 300),
                         decoration: BoxDecoration(
@@ -66,7 +66,7 @@ class ChatBubble extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.end,
             children: [
-            Text("12:39PM", style: TextStyle(fontSize: 14, color: Colors.black), textAlign: TextAlign.right,),
+            Text(messageTime, style: TextStyle(fontSize: 14, color: Colors.black), textAlign: TextAlign.right,),
             SizedBox(
               height:192,
               width: 227,
@@ -84,7 +84,7 @@ class ChatBubble extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.end,
             children: [
-            Text("12:39PM", style: TextStyle(fontSize: 14, color: Colors.black), textAlign: TextAlign.right,),
+            Text(messageTime, style: TextStyle(fontSize: 14, color: Colors.black), textAlign: TextAlign.right,),
             SizedBox(
               height:192,
               width: 227,

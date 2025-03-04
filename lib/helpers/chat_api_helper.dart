@@ -88,7 +88,7 @@ class ChatApiHelper {
     required String messageType,
     required String message,
     required String receiverId,
-    required String chatRoomId,
+    String? chatRoomId,
     required String senderId
   }) async {
     try {
