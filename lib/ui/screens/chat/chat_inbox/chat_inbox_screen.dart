@@ -84,7 +84,7 @@ class _ChatInboxScreenState extends State<ChatInboxScreen> {
       message: messageContent,
       receiverId: chatRoom?.chatProfile?.id ?? '',
       senderId: currentUserId!,
-      chatRoomId: widget.chatRoomId,
+      chatRoomId: widget.chatRoomId
     );
 
       WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -93,7 +93,22 @@ class _ChatInboxScreenState extends State<ChatInboxScreen> {
         }
       });
     }
-  
+    Future<void> sendImage(String messageType, XFile file) async {
+
+    await ChatApiHelper.sendChatMessage(
+      messageType: messageType,
+      receiverId: chatRoom?.chatProfile?.id ?? '',
+      senderId: currentUserId!,
+      chatRoomId: widget.chatRoomId,
+      file: file
+    );
+
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (_scrollController.hasClients) {
+          _scrollController.jumpTo(_scrollController.position.maxScrollExtent);
+        }
+      });
+    }
   void scrollToBottom() {
     if (_scrollController.hasClients) {
       _scrollController.animateTo(
@@ -166,10 +181,11 @@ class _ChatInboxScreenState extends State<ChatInboxScreen> {
                                 Align(
                                   alignment: isSelf ? Alignment.centerRight : Alignment.centerLeft,
                                   child: ChatBubble(
-                                    messageType: message.type ?? 'text',
+                                    messageType: message.type ?? 'TEXT',
                                     isSelf: isSelf,
                                     messageContent: message.content,
                                     messageTime: Jiffy.parse(message.createdAt!).toUtc().toLocal().format(pattern: 'HH:mm a'),
+                                    attachmentUrl: message.attachmentUrl,
                                   ),
                                 ),
                               ],
@@ -195,7 +211,7 @@ class _ChatInboxScreenState extends State<ChatInboxScreen> {
                 setState(() {
                   _selectedImage = selectedImage;
                 });
-                sendMessage("IMAGE", selectedImage!.path);
+                sendImage("IMAGE", selectedImage!);
               },
             ),
           ),

@@ -1,11 +1,14 @@
 import 'dart:convert';
+import 'dart:io';
 
+import 'package:image_picker/image_picker.dart';
 import 'package:lost_found_mfu/helpers/user_api_helper.dart';
 import 'package:lost_found_mfu/models/chat.dart';
 import 'package:lost_found_mfu/models/chat_inbox.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
-
+import 'package:mime/mime.dart';
+import 'package:http_parser/http_parser.dart';
 class ChatApiHelper {
   static final String? baseUrl = "http://10.0.2.2:3001/api";
 
@@ -84,12 +87,13 @@ class ChatApiHelper {
     }
   }
 
-    static Future<Map<String, dynamic>?> sendChatMessage({
+  static Future<Map<String, dynamic>?> sendChatMessage({
     required String messageType,
-    required String message,
+    String? message,
     required String receiverId,
     String? chatRoomId,
-    required String senderId
+    required String senderId,
+    XFile? file, 
   }) async {
     try {
       String? token = await getToken();
@@ -98,28 +102,79 @@ class ChatApiHelper {
         return null;
       }
 
-      final response = await http.post(
-        Uri.parse('$baseUrl/chats/send_message'),
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': 'Bearer $token',
-        },
-        body: jsonEncode({
-          "messageType": messageType,
-          "message": message,
-          "senderId": senderId,
-          "receiverId": receiverId,
-          "chatRoomId": chatRoomId,
-        }),
-      );
+      var uri = Uri.parse('$baseUrl/chats/send_message');
+       
+      if (message != null && file == null) {
+        final response = await http.post(
+          uri,
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer $token',
+          },
+          body: jsonEncode({
+            "messageType": messageType,
+            "message": message,
+            "senderId": senderId,
+            "receiverId": receiverId,
+            if (chatRoomId != null) "chatRoomId": chatRoomId,
+          }),
+        );
 
-      if (response.statusCode == 200) {
-        return jsonDecode(response.body); 
-      } else {
-        throw Exception("Failed to send message: ${response.body}");
+        if (response.statusCode == 200) {
+          return jsonDecode(response.body);
+        } else {
+          throw Exception("Failed to send message: ${response.body}");
+        }
       }
+
+      if (file != null && message == null) {
+        print("Sending Image...");
+
+        if (await file.length() == 0) {
+          print("Error: File is empty, not sending.");
+          return null;
+        }
+
+        var request = http.MultipartRequest('POST', uri)
+          ..headers['Authorization'] = 'Bearer $token'
+          ..fields['messageType'] = messageType
+          ..fields['senderId'] = senderId
+          ..fields['receiverId'] = receiverId;
+
+        if (chatRoomId != null) {
+          request.fields['chatRoomId'] = chatRoomId;
+        }
+
+        var fileBytes = await file.readAsBytes();
+        var mimeType = lookupMimeType(file.path) ?? 'application/octet-stream';
+
+        request.files.add(
+          http.MultipartFile.fromBytes(
+            'file',
+            fileBytes,
+            filename: file.name,
+            contentType: MediaType.parse(mimeType),
+          ),
+        );
+
+        var streamedResponse = await request.send();
+        var response = await http.Response.fromStream(streamedResponse);
+
+        print("Response Status: ${response.statusCode}");
+        print("Response Body: ${response.body}");
+
+        if (response.statusCode == 200 || response.statusCode == 201) {
+          return jsonDecode(response.body);
+        } else {
+          throw Exception("Failed to send file: ${response.body}");
+        }
+      }
+
+      print("Error: No message or file provided.");
+      return null;
+
     } catch (error) {
-      print("❌ Error sending message: $error");
+      print("Error sending chat message: $error");
       return null;
     }
   }

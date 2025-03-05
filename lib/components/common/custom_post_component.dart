@@ -218,12 +218,13 @@ class PostActions extends StatelessWidget {
                 );
                 
                 Navigator.pop(dialogContext); 
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => ChatScreen())
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text("Message sent successfully!"),
+                    duration: Duration(seconds: 2),
+                  ),
                 );
-                print("Sent message!");
+
               },
               child: const Text("Send"),
             ),

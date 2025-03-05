@@ -113,7 +113,7 @@ class _ChatScreenState extends State<ChatScreen> {
                             messagePreview: chatRoom.lastMessage?.content ?? "No messages yet",
                             messageCount: chatRoom.unreadCount,
                             messageTime: chatRoom.lastMessage?.createdAt != null
-                                ? Jiffy.parse(chatRoom.lastMessage?.createdAt ?? "").format(pattern: 'HH:mm a')
+                                ? Jiffy.parse(chatRoom.lastMessage?.createdAt ?? "").format(pattern: "HH:mm a")
                                 : '',
                           );
                         },
