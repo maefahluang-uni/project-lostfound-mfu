@@ -107,13 +107,14 @@ class _ChatScreenState extends State<ChatScreen> {
                         itemCount: chatRooms.length,
                         itemBuilder: (context, index) {
                           final chatRoom = chatRooms[index];
+                          print('chatRoomDate ${chatRoom?.lastMessage?.createdAt} ');
                           return ChatBar(
                             chatRoomId: chatRoom.id ?? '',
                             chatOwner: chatRoom.chatProfile?.fullName ?? "",
                             messagePreview: chatRoom.lastMessage?.content ?? "No messages yet",
                             messageCount: chatRoom.unreadCount,
                             messageTime: chatRoom.lastMessage?.createdAt != null
-                                ? Jiffy.parse(chatRoom.lastMessage?.createdAt ?? "").format(pattern: "HH:mm a")
+                                ? Jiffy.parse(chatRoom.lastMessage?.createdAt ?? "").format(pattern: "hh:mm a")
                                 : '',
                           );
                         },

@@ -184,7 +184,7 @@ class _ChatInboxScreenState extends State<ChatInboxScreen> {
                                     messageType: message.type ?? 'TEXT',
                                     isSelf: isSelf,
                                     messageContent: message.content,
-                                    messageTime: Jiffy.parse(message.createdAt!).toUtc().toLocal().format(pattern: 'HH:mm a'),
+                                    messageTime: Jiffy.parse(message.createdAt!).format(pattern: 'hh:mm a'),
                                     attachmentUrl: message.attachmentUrl,
                                   ),
                                 ),
