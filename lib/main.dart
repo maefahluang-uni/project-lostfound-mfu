@@ -12,6 +12,7 @@ import 'package:lost_found_mfu/ui/screens/setting/setting.dart';
 import 'package:lost_found_mfu/ui/screens/auth/signup.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -20,6 +21,17 @@ void main() async {
   String initialRoute = await getInitialRoute();
 
   await Firebase.initializeApp();
+  FirebaseMessaging messaging = FirebaseMessaging.instance;
+  NotificationSettings settings = await messaging.requestPermission(
+    alert: true,
+    badge: true,
+    sound: true,
+  );
+  if (settings.authorizationStatus == AuthorizationStatus.authorized) {
+    print("User granted permission for notifications.");
+  } else {
+    print("User denied permission.");
+  }
   runApp(MyApp(initialRoute: initialRoute));
 }
 final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
