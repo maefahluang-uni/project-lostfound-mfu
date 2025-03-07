@@ -71,8 +71,10 @@ class _CustomPostComponentState extends State<CustomPostComponent> {
             children: [
               Text(
                 postData['desc'] ?? "No description available.",
-                style:
-                    const TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
+                style: const TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w600,
+                    color: Color.fromARGB(255, 50, 50, 50)),
               ),
             ],
           ),
@@ -108,11 +110,11 @@ class UserInfoRow extends StatelessWidget {
           children: [
             CircleAvatar(
               radius: 22,
-              backgroundImage: postData['userImage'] != null &&
-                      postData['userImage'].isNotEmpty
-                  ? NetworkImage(postData['userImage']) // Online image
-                  : const AssetImage("assets/images/user.jpeg")
-                      as ImageProvider,
+              backgroundImage: postData['postOwner']['profileImage'] != null &&
+                      postData['postOwner']['profileImage'].isNotEmpty
+                  ? NetworkImage(
+                      postData['postOwner']['profileImage']) // Online image
+                  : AssetImage("assets/images/user.jpeg") as ImageProvider,
             ),
             const SizedBox(width: 10),
             Column(
@@ -133,6 +135,16 @@ class UserInfoRow extends StatelessWidget {
         ),
         Row(
           children: [
+            Badge(
+              label: Padding(
+                padding: const EdgeInsets.all(6),
+                child: Text(
+                  postData['item'],
+                  style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold),
+                ),
+              ),
+              backgroundColor: const Color.fromARGB(255, 82, 157, 255),
+            ),
             IconButton(
               onPressed: () {},
               icon: SizedBox(
@@ -175,12 +187,27 @@ class PostImage extends StatelessWidget {
 
     return Container(
       margin: const EdgeInsets.symmetric(vertical: 5),
-      decoration: BoxDecoration(borderRadius: BorderRadius.circular(10)),
-      child: Image.network(
-        imageUrl,
-        errorBuilder: (context, error, stackTrace) {
-          return Image.asset("assets/images/macbook.jpg");
-        },
+      height: 300,
+      width: double.infinity, // Ensure full width
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(10),
+      ),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(10), // Apply border radius to image
+        child: Image.network(
+          imageUrl,
+          width: double.infinity, // Ensure full width
+          height: 400, // Maintain container height
+          fit: BoxFit.cover, // Stretch image to cover the container
+          errorBuilder: (context, error, stackTrace) {
+            return Image.asset(
+              "assets/images/macbook.jpg",
+              width: double.infinity,
+              height: 400,
+              fit: BoxFit.cover,
+            );
+          },
+        ),
       ),
     );
   }

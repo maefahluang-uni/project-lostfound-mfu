@@ -34,6 +34,7 @@ class _ProfileState extends State<Profile> {
     setState(() {
       itemStatus = newStatus;
     });
+    loadUserProfile();
   }
 
   // Method to delete a post
@@ -76,9 +77,10 @@ class _ProfileState extends State<Profile> {
                 Center(
                   child: CircleAvatar(
                     radius: 80,
-                    backgroundImage: AssetImage(
-                      userData['profile'] ?? "assets/images/user.jpeg",
-                    ),
+                    backgroundImage: userData['profileImage'] != null
+                        ? NetworkImage(userData['profileImage'])
+                        : const AssetImage("assets/images/user.jpeg")
+                            as ImageProvider,
                   ),
                 ),
                 const SizedBox(height: 20),

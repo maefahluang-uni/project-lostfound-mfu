@@ -24,7 +24,13 @@ class _HomeState extends State<Home> {
   @override
   void initState() {
     super.initState();
-    userProfile = UserApiHelper.getUserProfile();
+    loadUserProfile();
+  }
+
+  void loadUserProfile() {
+    setState(() {
+      userProfile = UserApiHelper.getUserProfile();
+    });
   }
 
   void _onItemTapped(int index) {
@@ -72,7 +78,6 @@ class _HomeState extends State<Home> {
             color: Colors.red,
           ),
           onPressed: () {
-            // Handle notification action
             Navigator.push(context,
                 MaterialPageRoute(builder: (context) => NotificationScreen()));
           },
@@ -91,7 +96,9 @@ class _HomeState extends State<Home> {
               future: userProfile,
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
-                  return const Center(child: CircularProgressIndicator());
+                  return const CircleAvatar(
+                      radius: 18,
+                      backgroundImage: AssetImage("assets/images/user.jpeg"));
                 }
 
                 if (snapshot.hasError) {
@@ -102,9 +109,12 @@ class _HomeState extends State<Home> {
                   return const Center(child: Text("No profile data available"));
                 }
                 return CircleAvatar(
-                    radius: 18, // Size of the circle avatar
-                    backgroundImage: AssetImage(
-                        userData['profile'] ?? "assets/images/user.jpeg"));
+                  radius: 18,
+                  backgroundImage: userData['profileImage'] != null &&
+                          userData['profileImage'].isNotEmpty
+                      ? NetworkImage(userData['profileImage']) as ImageProvider
+                      : const AssetImage("assets/images/user.jpeg"),
+                );
               },
             ),
           ),

@@ -1,6 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
-
+import 'package:flutter/services.dart';
 import 'package:lost_found_mfu/helpers/user_api_helper.dart';
 import 'package:path/path.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -9,16 +9,19 @@ import 'package:http/http.dart' as http;
 class PostApiHelper {
   static final String? baseUrl = 'http://10.0.2.2:3001/api';
 
+  // Get token from shared preferences
   static Future<String?> getToken() async {
     final prefs = await SharedPreferences.getInstance();
     return prefs.getString('token');
   }
 
+  // Get UserId from shared preferences
   static Future<String?> getUserId() async {
     final prefs = await SharedPreferences.getInstance();
     return prefs.getString('userId');
   }
 
+  // Common headers for API requests
   static Map<String, String> _headers({String? token}) {
     return {
       "Content-Type": "application/json",
@@ -26,12 +29,13 @@ class PostApiHelper {
     };
   }
 
+  // Post post
   static Future<Map<String, dynamic>> uploadPost({
     required String item,
     required String itemStatus,
     required String date,
-    required String time,
-    required String location,
+    String? time,
+    String? location,
     File? imageFile,
     String? color,
     String? phone,
@@ -43,15 +47,15 @@ class PostApiHelper {
       return {};
     }
 
-    var uri = Uri.parse('$baseUrl/posts/upload-post');
-    var request = http.MultipartRequest('POST', uri)
+    var url = Uri.parse('$baseUrl/posts/upload-post');
+    var request = http.MultipartRequest('POST', url)
       ..headers['Authorization'] = 'Bearer $token'
       ..fields['item'] = item
       ..fields['itemStatus'] = itemStatus
-      ..fields['date'] = date
-      ..fields['time'] = time
-      ..fields['location'] = location;
+      ..fields['date'] = date;
 
+    if (time != null) request.fields['time'] = time;
+    if (location != null) request.fields['location'] = location;
     if (color != null) request.fields['color'] = color;
     if (phone != null) request.fields['phone'] = phone;
     if (desc != null) request.fields['desc'] = desc;
@@ -64,6 +68,14 @@ class PostApiHelper {
       request.files.add(multipartFile);
     } else {
       print("No image selected, skipping image upload.");
+      final byteData = await rootBundle.load('assets/images/macbook.jpg');
+      final imageBytes = byteData.buffer.asUint8List();
+
+      var stream = http.ByteStream.fromBytes(imageBytes);
+      var length = imageBytes.length;
+      var multipartFile =
+          http.MultipartFile('photos', stream, length, filename: 'macbook.jpg');
+      request.files.add(multipartFile);
     }
 
     try {
@@ -72,7 +84,9 @@ class PostApiHelper {
         print("Post uploaded successfully");
         return {"success": true, "message": "Post uploaded successfully"};
       } else {
-        print("Failed to upload post: ${response.statusCode}");
+        var responseBody = await response.stream.bytesToString();
+        print(
+            "Failed to upload post: ${response.statusCode}, Response: $responseBody");
         return {"success": false, "message": "Failed to upload post"};
       }
     } catch (e) {
@@ -81,6 +95,7 @@ class PostApiHelper {
     }
   }
 
+  // Get Posts
   static Future<List<Map<String, dynamic>>> getPosts(
       {String? itemStatus, String? search}) async {
     String? token = await getToken();
@@ -101,9 +116,13 @@ class PostApiHelper {
       final response =
           await http.get(Uri.parse(url), headers: _headers(token: token));
 
+      if (response.statusCode == 401) {
+        await UserApiHelper.logout();
+        return [];
+      }
+
       if (response.statusCode == 200) {
         Map<String, dynamic> data = jsonDecode(response.body);
-        // print("Response body: ${response.body}");
         List<Map<String, dynamic>> posts =
             List<Map<String, dynamic>>.from(data['posts'] ?? []);
 
@@ -113,7 +132,6 @@ class PostApiHelper {
           return [];
         }else {
         print("Failed to fetch posts. Status code: ${response.statusCode}");
-        print("Response body: ${response.body}");
         return [];
       }
     } catch (e) {
@@ -122,15 +140,15 @@ class PostApiHelper {
     }
   }
 
+  // Get Post
   static Future<Map<String, dynamic>> getSinglePost(String postId) async {
     String? token = await getToken();
     if (token == null) {
       throw Exception("User is not authenticated");
     }
 
-    final response = await http.get(
-        Uri.parse('$baseUrl/posts/get-single-post/${postId}'),
-        headers: _headers(token: token));
+    final url = Uri.parse('$baseUrl/posts/get-single-post/${postId}');
+    final response = await http.get(url, headers: _headers(token: token));
 
     if (response.statusCode == 200) {
       return jsonDecode(response.body);
@@ -139,10 +157,10 @@ class PostApiHelper {
     }
   }
 
+  // Share Post
   static Future<Map<String, dynamic>> getSharePost(String postId) async {
-    final response = await http.get(
-      Uri.parse('$baseUrl/posts/get-single-post/${postId}'),
-    );
+    final url = Uri.parse('$baseUrl/posts/get-single-post/${postId}');
+    final response = await http.get(url);
 
     if (response.statusCode == 200) {
       return jsonDecode(response.body);
@@ -151,13 +169,14 @@ class PostApiHelper {
     }
   }
 
+  // Update Post
   static Future<Map<String, dynamic>> editPost({
     required String postId,
     required String item,
     required String itemStatus,
     required String date,
-    required String time,
-    required String location,
+    String? time,
+    String? location,
     File? imageFile,
     String? color,
     String? phone,
@@ -173,10 +192,10 @@ class PostApiHelper {
       ..headers['Authorization'] = 'Bearer $token'
       ..fields['item'] = item
       ..fields['itemStatus'] = itemStatus
-      ..fields['date'] = date
-      ..fields['time'] = time
-      ..fields['location'] = location;
+      ..fields['date'] = date;
 
+    if (time != null) request.fields['time'] = time;
+    if (location != null) request.fields['location'] = location;
     if (color != null) request.fields['color'] = color;
     if (phone != null) request.fields['phone'] = phone;
     if (desc != null) request.fields['desc'] = desc;
@@ -206,6 +225,7 @@ class PostApiHelper {
     }
   }
 
+  // Delete Post
   static Future<Map<String, dynamic>> deletePost(String postId) async {
     String? token = await getToken();
     if (token == null) {
@@ -213,11 +233,10 @@ class PostApiHelper {
       return {};
     }
 
-    final response = await http.delete(
-        Uri.parse(
-          '$baseUrl/posts/delete-post/$postId',
-        ),
-        headers: _headers(token: token));
+    final url = Uri.parse(
+      '$baseUrl/posts/delete-post/$postId',
+    );
+    final response = await http.delete(url, headers: _headers(token: token));
 
     if (response.statusCode == 200) {
       return {"success": true, "message": "Post deleted successfully"};

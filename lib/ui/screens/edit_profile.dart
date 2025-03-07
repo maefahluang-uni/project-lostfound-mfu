@@ -1,10 +1,11 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:lost_found_mfu/components/common/custom_appbar.dart';
 import 'package:lost_found_mfu/components/custom_button.dart';
 import 'package:lost_found_mfu/components/custom_text_field.dart';
 import 'package:lost_found_mfu/helpers/user_api_helper.dart';
 import 'package:lost_found_mfu/ui/screens/home.dart';
-import 'package:lost_found_mfu/ui/screens/profile.dart';
 import 'package:lost_found_mfu/ui/theme/app_color.dart';
 
 class EditProfile extends StatefulWidget {
@@ -18,8 +19,10 @@ class _EditProfileState extends State<EditProfile> {
   final TextEditingController _editUsernameController = TextEditingController();
   final TextEditingController _editBioController = TextEditingController();
   String profileImageUrl = "assets/images/user.jpeg";
+  File? _imageFile;
   bool isLoading = true;
 
+  @override
   void initState() {
     super.initState();
     _loadUserProfile();
@@ -30,32 +33,43 @@ class _EditProfileState extends State<EditProfile> {
     setState(() {
       _editUsernameController.text = userData['fullName'] ?? '';
       _editBioController.text = userData['bio'] ?? '';
-      profileImageUrl = ((userData['profileImage'] != null &&
-              userData['profileImage']!.isNotEmpty)
-          ? userData['profileImage']
-          : "assets/images/user.jpeg")!;
+      profileImageUrl = userData['profileImage'] ?? "assets/images/user.jpeg";
       isLoading = false;
     });
+  }
+
+  Future<void> _pickImage() async {
+    final ImagePicker picker = ImagePicker();
+    final XFile? pickedFile =
+        await picker.pickImage(source: ImageSource.gallery);
+
+    if (pickedFile != null) {
+      setState(() {
+        _imageFile = File(pickedFile.path);
+      });
+    }
   }
 
   Future<void> _updateUserProfile() async {
     final name = _editUsernameController.text.trim();
     final bio = _editBioController.text.trim();
 
-    print("$name : $bio");
-
+    // Convert _imageFile to Base64 or Upload it to the server
+    String? updatedProfileImage =
+        _imageFile != null ? _imageFile!.path : profileImageUrl;
+    print('$name, $bio, $updatedProfileImage');
     final response =
-        await UserApiHelper.updateUserProfile(name, bio, profileImageUrl);
+        await UserApiHelper.updateUserProfile(name, bio, updatedProfileImage);
 
     if (response.isNotEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Profile updated successfully')));
+          const SnackBar(content: Text('Profile updated successfully')));
       await _loadUserProfile();
       Navigator.pushReplacement(
-          context, MaterialPageRoute(builder: (context) => Home()));
+          context, MaterialPageRoute(builder: (context) => const Home()));
     } else {
-      ScaffoldMessenger.of(context)
-          .showSnackBar(SnackBar(content: Text('Falied to update profile')));
+      ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Failed to update profile')));
     }
   }
 
@@ -64,7 +78,7 @@ class _EditProfileState extends State<EditProfile> {
     return Scaffold(
       appBar: CustomAppbar(appBarTitle: "Edit Profile", hasBackArrow: true),
       body: isLoading
-          ? Center(child: CircularProgressIndicator())
+          ? const Center(child: CircularProgressIndicator())
           : Column(
               children: [
                 Center(
@@ -72,22 +86,20 @@ class _EditProfileState extends State<EditProfile> {
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
                       CircleAvatar(
-                          radius: 80, // Size of the avatar
-                          backgroundImage: AssetImage(profileImageUrl)),
-                      const SizedBox(
-                          height: 20), // Spacing between avatar and button
+                        radius: 80,
+                        backgroundImage: _imageFile != null
+                            ? FileImage(_imageFile!)
+                            : NetworkImage(profileImageUrl) as ImageProvider,
+                      ),
+                      const SizedBox(height: 20),
                       ElevatedButton.icon(
-                        onPressed: () {
-                          // Add your edit profile logic here
-                        },
+                        onPressed: _pickImage,
                         style: ElevatedButton.styleFrom(
-                          backgroundColor:
-                              AppColor.theme.primaryColor, // Button color
+                          backgroundColor: AppColor.theme.primaryColor,
                           padding: const EdgeInsets.symmetric(
                               horizontal: 20, vertical: 12),
                           shape: RoundedRectangleBorder(
-                            borderRadius:
-                                BorderRadius.circular(30), // Rounded edges
+                            borderRadius: BorderRadius.circular(30),
                           ),
                         ),
                         icon: const Icon(Icons.edit, color: Colors.white),
@@ -99,58 +111,39 @@ class _EditProfileState extends State<EditProfile> {
                     ],
                   ),
                 ),
-                SizedBox(
-                  height: 40,
-                ),
+                const SizedBox(height: 40),
                 Container(
-                  margin: EdgeInsets.symmetric(horizontal: 20),
+                  margin: const EdgeInsets.symmetric(horizontal: 20),
                   child: Column(
                     children: [
-                      Align(
-                        alignment: Alignment
-                            .centerLeft, // Align only this text to the left
-                        child: const Text(
+                      const Align(
+                        alignment: Alignment.centerLeft,
+                        child: Text(
                           "Edit Username",
-                          style: TextStyle(
-                            fontSize: 16,
-                          ),
+                          style: TextStyle(fontSize: 16),
                         ),
                       ),
-                      SizedBox(
-                        height: 4,
-                      ),
+                      const SizedBox(height: 4),
                       CustomTextField(controller: _editUsernameController),
-                      SizedBox(
-                        height: 20,
-                      ),
-                      Align(
-                        alignment: Alignment
-                            .centerLeft, // Align only this text to the left
-                        child: const Text(
+                      const SizedBox(height: 20),
+                      const Align(
+                        alignment: Alignment.centerLeft,
+                        child: Text(
                           "Edit Bio",
-                          style: TextStyle(
-                            fontSize: 16,
-                          ),
+                          style: TextStyle(fontSize: 16),
                         ),
                       ),
-                      SizedBox(
-                        height: 4,
-                      ),
-                      CustomTextField(
-                        controller: _editBioController,
-                        height: 200,
-                      ),
-                      SizedBox(
-                        height: 30,
-                      ),
+                      const SizedBox(height: 4),
+                      CustomTextField(controller: _editBioController),
+                      const SizedBox(height: 30),
                       CustomButton(
                         text: 'Save Changes',
                         onPressed: _updateUserProfile,
                         width: 400,
-                      )
+                      ),
                     ],
                   ),
-                )
+                ),
               ],
             ),
     );

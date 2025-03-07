@@ -22,7 +22,7 @@ class _SettingState extends State<Setting> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: CustomAppbar(appBarTitle: "Setting", hasBackArrow: true),
+      appBar: CustomAppbar(appBarTitle: "Setting", hasBackArrow: false),
       body: Column(
         children: [
           buildSettingRow("About", Icons.question_mark_outlined, () {

@@ -3,7 +3,6 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:lost_found_mfu/components/common/custom_appbar.dart';
 import 'package:lost_found_mfu/components/custom_button.dart';
 import 'package:lost_found_mfu/components/custom_text_field.dart';
 import 'package:lost_found_mfu/components/custom_dropdown.dart';
@@ -47,7 +46,19 @@ class _UploadPostScreenState extends State<UploadPostScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: CustomAppbar(appBarTitle: "Post", hasBackArrow: false),
+      appBar: AppBar(
+        title: const Text(
+          'Upload Post',
+          style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+        ),
+        centerTitle: false,
+        leading: IconButton(
+            onPressed: () {
+              Navigator.pushReplacement(
+                  context, MaterialPageRoute(builder: (context) => Home()));
+            },
+            icon: const Icon(Icons.arrow_back)),
+      ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
         child: Form(
@@ -213,8 +224,10 @@ class _UploadPostScreenState extends State<UploadPostScreen> {
                             date: _dateController.text.trim(),
                             time: _timeController.text.trim(),
                             location: _locationController.text.trim(),
-                            imageFile: _imageFileController.text.isNotEmpty
-                                ? File(_imageFileController.text.trim())
+                            imageFile: selectedImages != null &&
+                                    selectedImages!.isNotEmpty
+                                ? File(selectedImages![0]
+                                    .path) // Use the first selected image
                                 : null,
                             color: _colorController.text.isNotEmpty
                                 ? _colorController.text.trim()
@@ -229,9 +242,13 @@ class _UploadPostScreenState extends State<UploadPostScreen> {
                         if (response.containsKey("error")) {
                           ScaffoldMessenger.of(context).showSnackBar(
                               SnackBar(content: Text(response["error"])));
+                        } else if (response['status'] == 500) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(content: Text("Server Error")));
                         } else {
                           ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                              content: Text("Upload Post Successfully")));
+                              content: Text("Upload Post Successfully"),
+                              backgroundColor: Colors.green));
                           Navigator.push(context,
                               MaterialPageRoute(builder: (context) => Home()));
                         }
