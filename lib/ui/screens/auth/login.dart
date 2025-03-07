@@ -131,13 +131,17 @@ class _LoginState extends State<Login> {
                                       if (response.containsKey("error")) {
                                         ScaffoldMessenger.of(context)
                                             .showSnackBar(SnackBar(
-                                                content:
-                                                    Text(response["error"])));
+                                          content: Text(response["error"]),
+                                        ));
                                       } else {
                                         ScaffoldMessenger.of(context)
                                             .showSnackBar(SnackBar(
                                                 content:
-                                                    Text("Signin Successful")));
+                                                    Text("Signin Successful"),
+                                                backgroundColor: response
+                                                        .containsKey("error")
+                                                    ? Colors.red
+                                                    : Colors.green));
                                         Navigator.push(
                                             context,
                                             MaterialPageRoute(

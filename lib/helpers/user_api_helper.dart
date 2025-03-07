@@ -16,6 +16,7 @@ class UserApiHelper {
     return prefs.getString('token');
   }
 
+  // Get userId from shared preferences
   static Future<String?> getUserId() async {
     final prefs = await SharedPreferences.getInstance();
     return prefs.getString('userId');
@@ -106,15 +107,22 @@ class UserApiHelper {
   }
 
   // Change Password
-  static Future<bool> changePassword(String newPassword) async {
+  static Future<bool> changePassword(
+      String oldPassword, String newPassword) async {
     String? token = await getToken();
+    String? userId = await getUserId();
 
-    if (token != null) {
+    if (token != null && userId != null) {
+      final url = Uri.parse('$baseUrl/users/change-password');
+
       try {
-        final response = await http.post(
-            Uri.parse('$baseUrl/users/change-password'),
+        final response = await http.post(url,
             headers: _headers(token: token),
-            body: jsonEncode({"newPassword": newPassword}));
+            body: jsonEncode({
+              "uid": userId,
+              "oldPassword": oldPassword,
+              "newPassword": newPassword
+            }));
 
         if (response.statusCode == 200) {
           return true;
@@ -131,13 +139,14 @@ class UserApiHelper {
     }
   }
 
+  // Get User Data
   static Future<Map<String, dynamic>> getUserProfile() async {
     String? token = await getToken();
     String? userId = await getUserId();
 
     try {
-      final response = await http.get(Uri.parse('$baseUrl/users/user/$userId'),
-          headers: _headers(token: token));
+      final url = Uri.parse('$baseUrl/users/user/$userId');
+      final response = await http.get(url, headers: _headers(token: token));
 
       if (response.statusCode == 200) {
         Map<String, dynamic> data = jsonDecode(response.body);
@@ -159,6 +168,7 @@ class UserApiHelper {
     }
   }
 
+  // Update User Data
   static Future<Map<String, dynamic>> updateUserProfile(
     String name,
     String bio,
@@ -168,7 +178,8 @@ class UserApiHelper {
     String? userId = await getUserId();
 
     try {
-      final response = await http.put(Uri.parse('$baseUrl/users/user/$userId'),
+      final url = Uri.parse('$baseUrl/users/user/$userId');
+      final response = await http.put(url,
           headers: _headers(token: token),
           body: json.encode({
             'fullName': name,
@@ -189,14 +200,14 @@ class UserApiHelper {
     }
   }
 
+  // Delete User Data
   static Future<bool> deleteUser() async {
     String? token = await getToken();
     String? userId = await getUserId();
 
     try {
-      final response = await http.delete(
-          Uri.parse("$baseUrl/users/user/$userId"),
-          headers: _headers(token: token));
+      final url = Uri.parse("$baseUrl/users/user/$userId");
+      final response = await http.delete(url, headers: _headers(token: token));
       if (response.statusCode == 200) {
         print(response.body);
         return json.decode(response.body);
@@ -210,6 +221,7 @@ class UserApiHelper {
     }
   }
 
+  // Sign in with Google
   static Future<Map<String, dynamic>> signInWithGoogle() async {
     try {
       final GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
@@ -221,8 +233,9 @@ class UserApiHelper {
 
       if (idToken == null) throw Exception("Failed to get idToken");
 
+      final url = Uri.parse("$baseUrl/users/google-signin");
       final response = await http.post(
-        Uri.parse("$baseUrl/users/google-signin"),
+        url,
         body: jsonEncode({"idToken": idToken}),
       );
 
@@ -238,6 +251,7 @@ class UserApiHelper {
     }
   }
 
+  // Authenticate with Firebase
   static Future<UserCredential?> authenticateWithFirebase(
       String customToken) async {
     try {

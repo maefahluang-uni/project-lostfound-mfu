@@ -95,9 +95,25 @@ class ProfileListing extends StatelessWidget {
                 ],
               ),
               PopupMenuButton<String>(
-                onSelected: (value) {
+                onSelected: (value) async {
                   if (value == 'resolved') {
-                    onStatusUpdate('Resolved');
+                    try {
+                      await PostApiHelper.editPost(
+                          postId: postId,
+                          item: item,
+                          itemStatus: "Resolved",
+                          date: date);
+                      onStatusUpdate('Resolved');
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                            content: Text("Post marked as resolved")),
+                      );
+                    } catch (e) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                            content: Text("Error updating post status: $e")),
+                      );
+                    }
                   }
                   if (value == 'delete') {
                     deletePost(context, postId);

@@ -4,7 +4,7 @@ import 'package:lost_found_mfu/components/common/notification_card.dart';
 import 'package:lost_found_mfu/components/utils/bottom_navigation.dart';
 import 'package:lost_found_mfu/ui/screens/chat/chat_screen.dart';
 import 'package:lost_found_mfu/ui/screens/home.dart';
-import 'package:lost_found_mfu/ui/screens/post.dart';
+import 'package:lost_found_mfu/ui/screens/post/upload_post.dart';
 import 'package:lost_found_mfu/ui/screens/search.dart';
 import 'package:lost_found_mfu/ui/screens/setting/setting.dart';
 
@@ -30,7 +30,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
     NotificationScreen(),
     Home(),
     Search(),
-    Post(),
+    UploadPostScreen(),
     ChatScreen(),
     Setting()
   ];
@@ -41,7 +41,10 @@ class _NotificationScreenState extends State<NotificationScreen> {
       _pages[0] = NotificationScreen();
     }
     return Scaffold(
-      appBar: CustomAppbar(appBarTitle: "Notifications", hasBackArrow: true,),
+      appBar: CustomAppbar(
+        appBarTitle: "Notifications",
+        hasBackArrow: true,
+      ),
       body: SingleChildScrollView(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
