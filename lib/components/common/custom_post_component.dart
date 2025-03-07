@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:lost_found_mfu/components/common/copy_link.dart';
 import 'package:lost_found_mfu/helpers/chat_api_helper.dart';
-import 'package:lost_found_mfu/main.dart';
-import 'package:lost_found_mfu/ui/screens/chat/chat_screen.dart';
 import 'package:lost_found_mfu/ui/screens/detail.dart';
 import 'package:lost_found_mfu/ui/theme/app_color.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -26,12 +24,14 @@ class _CustomPostComponentState extends State<CustomPostComponent> {
     postData = widget.postData;
     initUserData();
   }
+
   Future<void> initUserData() async {
     final prefs = await SharedPreferences.getInstance();
     setState(() {
       currentUserId = prefs.getString('userId');
     });
   }
+
   void handleMenuSelection(String value) {
     if (value == 'resolve') {
       setState(() {
@@ -217,9 +217,13 @@ class PostImage extends StatelessWidget {
 class PostActions extends StatelessWidget {
   final String id;
   final Map<String, dynamic> postData;
-  String currentUserId;
+  final String currentUserId;
 
-   PostActions({super.key, required this.id, required this.postData, required this.currentUserId});
+  PostActions(
+      {super.key,
+      required this.id,
+      required this.postData,
+      required this.currentUserId});
 
   void _showMessagePopup(BuildContext context) {
     showDialog(
@@ -227,7 +231,8 @@ class PostActions extends StatelessWidget {
       builder: (BuildContext dialogContext) {
         return AlertDialog(
           title: const Text("Send Message"),
-          content: Text("Do you want to start conversation with ${postData['postOwner']['displayName'] ?? "this user"}?"),
+          content: Text(
+              "Do you want to start conversation with ${postData['postOwner']['displayName'] ?? "this user"}?"),
           actions: [
             TextButton(
               onPressed: () {
@@ -238,20 +243,18 @@ class PostActions extends StatelessWidget {
             ElevatedButton(
               onPressed: () async {
                 await ChatApiHelper.sendChatMessage(
-                  message: "Hello",
-                  messageType: "TEXT",
-                  receiverId: postData['postOwner']['id'],
-                  senderId: currentUserId
-                );
-                
-                Navigator.pop(dialogContext); 
+                    message: "Hello",
+                    messageType: "TEXT",
+                    receiverId: postData['postOwner']['id'],
+                    senderId: currentUserId);
+
+                Navigator.pop(dialogContext);
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
                     content: Text("Message sent successfully!"),
                     duration: Duration(seconds: 2),
                   ),
                 );
-
               },
               child: const Text("Send"),
             ),
@@ -260,6 +263,7 @@ class PostActions extends StatelessWidget {
       },
     );
   }
+
   @override
   Widget build(BuildContext context) {
     return SizedBox(

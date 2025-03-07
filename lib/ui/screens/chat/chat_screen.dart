@@ -28,23 +28,25 @@ class _ChatScreenState extends State<ChatScreen> {
   void initState() {
     super.initState();
     socketService = SocketService();
-  _initializeSocketAndFetchRooms();
+    _initializeSocketAndFetchRooms();
     socketService.listenForRefresh((roomId) {
-        fetchChatRooms(loadingRequired: false);
+      fetchChatRooms(loadingRequired: false);
     });
 
     _chatsSearchController.addListener(_onSearchChanged);
   }
 
-  Future<void> fetchChatRooms({String? searchQuery, bool? loadingRequired}) async {
+  Future<void> fetchChatRooms(
+      {String? searchQuery, bool? loadingRequired}) async {
     try {
-      if(loadingRequired!){
+      if (loadingRequired!) {
         setState(() {
           isLoading = true;
         });
       }
 
-      List<ChatRoom> fetchedRooms = await ChatApiHelper.getChatRooms(searchQuery: searchQuery);
+      List<ChatRoom> fetchedRooms =
+          await ChatApiHelper.getChatRooms(searchQuery: searchQuery);
       setState(() {
         chatRooms = fetchedRooms;
         isLoading = false;
@@ -63,26 +65,30 @@ class _ChatScreenState extends State<ChatScreen> {
       fetchChatRooms(searchQuery: _chatsSearchController.text.trim());
     });
   }
-  Future<void> joinAllChatRooms(List<ChatRoom> chatRooms, SocketService socketService) async{
+
+  Future<void> joinAllChatRooms(
+      List<ChatRoom> chatRooms, SocketService socketService) async {
     for (ChatRoom room in chatRooms) {
       if (room.id != null) {
         socketService.joinRoom(room.id!);
       }
     }
   }
-  Future<void> _initializeSocketAndFetchRooms() async {
 
-    await fetchChatRooms(loadingRequired: true); 
+  Future<void> _initializeSocketAndFetchRooms() async {
+    await fetchChatRooms(loadingRequired: true);
     print("Fetching chat rooms completed. Joining rooms...");
 
-    await joinAllChatRooms(chatRooms, socketService); 
+    await joinAllChatRooms(chatRooms, socketService);
   }
-    @override
+
+  @override
   void dispose() {
     _chatsSearchController.dispose();
     _debounce?.cancel();
     super.dispose();
   }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -100,21 +106,25 @@ class _ChatScreenState extends State<ChatScreen> {
           ),
           Expanded(
             child: isLoading
-                ? const Center(child: CircularProgressIndicator()) 
+                ? const Center(child: CircularProgressIndicator())
                 : chatRooms.isEmpty
-                    ? const Center(child: Text("No chats found")) 
+                    ? const Center(child: Text("No chats found"))
                     : ListView.builder(
                         itemCount: chatRooms.length,
                         itemBuilder: (context, index) {
                           final chatRoom = chatRooms[index];
-                          print('chatRoomDate ${chatRoom?.lastMessage?.createdAt} ');
+                          print(
+                              'chatRoomDate ${chatRoom.lastMessage?.createdAt} ');
                           return ChatBar(
                             chatRoomId: chatRoom.id ?? '',
                             chatOwner: chatRoom.chatProfile?.fullName ?? "",
-                            messagePreview: chatRoom.lastMessage?.content ?? "No messages yet",
+                            messagePreview: chatRoom.lastMessage?.content ??
+                                "No messages yet",
                             messageCount: chatRoom.unreadCount,
                             messageTime: chatRoom.lastMessage?.createdAt != null
-                                ? Jiffy.parse(chatRoom.lastMessage?.createdAt ?? "").format(pattern: "hh:mm a")
+                                ? Jiffy.parse(
+                                        chatRoom.lastMessage?.createdAt ?? "")
+                                    .format(pattern: "hh:mm a")
                                 : '',
                           );
                         },
