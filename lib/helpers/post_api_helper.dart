@@ -1,6 +1,5 @@
 import 'dart:convert';
 import 'dart:io';
-
 import 'package:flutter/services.dart';
 import 'package:lost_found_mfu/helpers/user_api_helper.dart';
 import 'package:path/path.dart';
@@ -128,7 +127,10 @@ class PostApiHelper {
             List<Map<String, dynamic>>.from(data['posts'] ?? []);
 
         return posts;
-      } else {
+      } else if(response.statusCode == 401){
+          await UserApiHelper.forceLogout();
+          return [];
+        }else {
         print("Failed to fetch posts. Status code: ${response.statusCode}");
         return [];
       }

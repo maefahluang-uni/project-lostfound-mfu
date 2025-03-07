@@ -51,14 +51,24 @@ class _ChatInboxScreenState extends State<ChatInboxScreen> {
   Future<void> fetchChatRoom() async {
     try {
       ChatInbox? fetchedRoom = await ChatApiHelper.getChatRoom(widget.chatRoomId);
+      
+      if (!mounted) return;
+
       setState(() {
         chatRoom = fetchedRoom;
         isLoading = false;
       });
+
       await ChatApiHelper.readChatRoom(widget.chatRoomId);
-      WidgetsBinding.instance.addPostFrameCallback((_) => scrollToBottom());
+
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) {
+          scrollToBottom();
+        }
+      });
 
     } catch (error) {
+      if (!mounted) return; 
       setState(() {
         errorMessage = "Error fetching chat rooms: $error";
         isLoading = false;
@@ -74,7 +84,7 @@ class _ChatInboxScreenState extends State<ChatInboxScreen> {
       message: messageContent,
       receiverId: chatRoom?.chatProfile?.id ?? '',
       senderId: currentUserId!,
-      chatRoomId: widget.chatRoomId,
+      chatRoomId: widget.chatRoomId
     );
 
       WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -83,7 +93,22 @@ class _ChatInboxScreenState extends State<ChatInboxScreen> {
         }
       });
     }
-  
+    Future<void> sendImage(String messageType, XFile file) async {
+
+    await ChatApiHelper.sendChatMessage(
+      messageType: messageType,
+      receiverId: chatRoom?.chatProfile?.id ?? '',
+      senderId: currentUserId!,
+      chatRoomId: widget.chatRoomId,
+      file: file
+    );
+
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (_scrollController.hasClients) {
+          _scrollController.jumpTo(_scrollController.position.maxScrollExtent);
+        }
+      });
+    }
   void scrollToBottom() {
     if (_scrollController.hasClients) {
       _scrollController.animateTo(
@@ -93,7 +118,15 @@ class _ChatInboxScreenState extends State<ChatInboxScreen> {
       );
     }
   }
+  @override
+  void dispose() {
 
+    socketService.listenForRefresh((roomId) {});
+
+    _scrollController.dispose();
+    
+    super.dispose();
+  }
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -148,10 +181,11 @@ class _ChatInboxScreenState extends State<ChatInboxScreen> {
                                 Align(
                                   alignment: isSelf ? Alignment.centerRight : Alignment.centerLeft,
                                   child: ChatBubble(
-                                    messageType: message.type ?? 'text',
+                                    messageType: message.type ?? 'TEXT',
                                     isSelf: isSelf,
                                     messageContent: message.content,
-                                    messageTime: Jiffy.parse(message.createdAt!).format(pattern: 'HH:mm a'),
+                                    messageTime: Jiffy.parse(message.createdAt!).format(pattern: 'hh:mm a'),
+                                    attachmentUrl: message.attachmentUrl,
                                   ),
                                 ),
                               ],
@@ -177,7 +211,7 @@ class _ChatInboxScreenState extends State<ChatInboxScreen> {
                 setState(() {
                   _selectedImage = selectedImage;
                 });
-                sendMessage("IMAGE", selectedImage!.path);
+                sendImage("IMAGE", selectedImage!);
               },
             ),
           ),

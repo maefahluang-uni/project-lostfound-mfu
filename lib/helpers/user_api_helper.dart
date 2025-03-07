@@ -1,8 +1,10 @@
 import 'dart:convert';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:http/http.dart' as http;
+import 'package:lost_found_mfu/main.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 
 class UserApiHelper {
   static final String? baseUrl = 'http://10.0.2.2:3001/api';
@@ -62,12 +64,13 @@ class UserApiHelper {
   static Future<Map<String, dynamic>> signIn(
       String email, String password) async {
     final url = Uri.parse('$baseUrl/users/signin');
+    String? fcmToken = await FirebaseMessaging.instance.getToken();
 
     try {
       final response = await http.post(
         url,
         headers: _headers(),
-        body: jsonEncode({"email": email, "password": password}),
+        body: jsonEncode({"email": email, "password": password, "fcmToken":fcmToken }),
       );
 
       final data = jsonDecode(response.body);
@@ -230,13 +233,14 @@ class UserApiHelper {
       final GoogleSignInAuthentication googleAuth =
           await googleUser.authentication;
       final idToken = googleAuth.idToken;
+    String? fcmToken = await FirebaseMessaging.instance.getToken();
 
       if (idToken == null) throw Exception("Failed to get idToken");
 
       final url = Uri.parse("$baseUrl/users/google-signin");
       final response = await http.post(
         url,
-        body: jsonEncode({"idToken": idToken}),
+        body: jsonEncode({"idToken": idToken,"fcmToken": fcmToken}),
       );
 
       if (response.statusCode == 200) {
@@ -262,5 +266,10 @@ class UserApiHelper {
       print("Firebase Authentication Error: $e");
       return null;
     }
+  }
+
+  static Future<void> forceLogout () async { 
+    await logout();
+    navigatorKey.currentState?.pushNamedAndRemoveUntil('/login', (route) => false);
   }
 }

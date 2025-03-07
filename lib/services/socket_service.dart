@@ -12,8 +12,11 @@ class SocketService {
 
   Future<void> initSocket() async {
     _socket = IO.io("ws://10.0.2.2:3001", <String, dynamic>{
-      "transports": ["websocket"],
-      "autoConnect": false, 
+      'transports': ['websocket'],
+      'autoConnect': false,
+      'reconnection': true,
+      'reconnectionAttempts': 5,
+      'reconnectionDelay': 2000,
     });
 
     _socket.connect();
@@ -27,6 +30,7 @@ class SocketService {
   }
 
   void joinRoom(String chatRoomId) {
+    print("JOINING ROOM!");
     _socket.emit('join_room', {
       "data": {"chatRoomId": chatRoomId}
     });
@@ -39,6 +43,7 @@ class SocketService {
       onRefresh(data);
     });
   }
+  
     void disconnect() {
     _socket.disconnect();
   }

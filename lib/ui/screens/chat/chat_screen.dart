@@ -28,8 +28,7 @@ class _ChatScreenState extends State<ChatScreen> {
   void initState() {
     super.initState();
     socketService = SocketService();
-    fetchChatRooms(loadingRequired: true);
-    joinAllChatRooms(chatRooms, socketService);
+  _initializeSocketAndFetchRooms();
     socketService.listenForRefresh((roomId) {
         fetchChatRooms(loadingRequired: false);
     });
@@ -64,19 +63,25 @@ class _ChatScreenState extends State<ChatScreen> {
       fetchChatRooms(searchQuery: _chatsSearchController.text.trim());
     });
   }
-
-  @override
-  void dispose() {
-    _chatsSearchController.dispose();
-    _debounce?.cancel();
-    super.dispose();
-  }
-  void joinAllChatRooms(List<ChatRoom> chatRooms, SocketService socketService) {
+  Future<void> joinAllChatRooms(List<ChatRoom> chatRooms, SocketService socketService) async{
     for (ChatRoom room in chatRooms) {
       if (room.id != null) {
         socketService.joinRoom(room.id!);
       }
     }
+  }
+  Future<void> _initializeSocketAndFetchRooms() async {
+
+    await fetchChatRooms(loadingRequired: true); 
+    print("Fetching chat rooms completed. Joining rooms...");
+
+    await joinAllChatRooms(chatRooms, socketService); 
+  }
+    @override
+  void dispose() {
+    _chatsSearchController.dispose();
+    _debounce?.cancel();
+    super.dispose();
   }
   @override
   Widget build(BuildContext context) {
@@ -102,13 +107,14 @@ class _ChatScreenState extends State<ChatScreen> {
                         itemCount: chatRooms.length,
                         itemBuilder: (context, index) {
                           final chatRoom = chatRooms[index];
+                          print('chatRoomDate ${chatRoom?.lastMessage?.createdAt} ');
                           return ChatBar(
                             chatRoomId: chatRoom.id ?? '',
                             chatOwner: chatRoom.chatProfile?.fullName ?? "",
                             messagePreview: chatRoom.lastMessage?.content ?? "No messages yet",
                             messageCount: chatRoom.unreadCount,
                             messageTime: chatRoom.lastMessage?.createdAt != null
-                                ? Jiffy.parse(chatRoom.lastMessage?.createdAt ?? "").format(pattern: 'HH:mm a')
+                                ? Jiffy.parse(chatRoom.lastMessage?.createdAt ?? "").format(pattern: "hh:mm a")
                                 : '',
                           );
                         },

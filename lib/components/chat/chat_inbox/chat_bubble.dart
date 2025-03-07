@@ -5,12 +5,12 @@ import 'package:image_picker/image_picker.dart';
 import 'package:lost_found_mfu/ui/theme/app_color.dart';
 
 class ChatBubble extends StatelessWidget {
-  const ChatBubble({super.key, required this.isSelf, required this.messageType, this.messageImage, this.messageContent, required this.messageTime});
+  const ChatBubble({super.key, required this.isSelf, required this.messageType, this.messageContent, required this.messageTime, this.attachmentUrl});
   final bool isSelf;
   final String messageType;
-  final XFile? messageImage;
   final String? messageContent;
   final String messageTime;
+  final String? attachmentUrl;
   Widget generateMessage(){
     switch (messageType){
       case "TEXT":
@@ -21,7 +21,7 @@ class ChatBubble extends StatelessWidget {
                     mainAxisSize: MainAxisSize.min,
                     crossAxisAlignment: CrossAxisAlignment.end,
                     children: [
-                      Text("12:39PM", style: TextStyle(fontSize: 14, color: Colors.black), textAlign: TextAlign.left,),
+                      Text(messageTime, style: TextStyle(fontSize: 14, color: Colors.black), textAlign: TextAlign.left,),
                       Container(
                         constraints: BoxConstraints(minWidth:100, maxWidth: 300),
                         decoration: BoxDecoration(
@@ -44,7 +44,7 @@ class ChatBubble extends StatelessWidget {
                     mainAxisSize: MainAxisSize.min,
                     crossAxisAlignment: CrossAxisAlignment.end,
                     children: [
-                      Text("12:39PM", style: TextStyle(fontSize: 14, color: Colors.black), textAlign: TextAlign.right,),
+                      Text(messageTime, style: TextStyle(fontSize: 14, color: Colors.black), textAlign: TextAlign.right,),
                       Container(
                         constraints: BoxConstraints(minWidth:100, maxWidth: 300),
                         decoration: BoxDecoration(
@@ -66,13 +66,13 @@ class ChatBubble extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.end,
             children: [
-            Text("12:39PM", style: TextStyle(fontSize: 14, color: Colors.black), textAlign: TextAlign.right,),
+            Text(messageTime, style: TextStyle(fontSize: 14, color: Colors.black), textAlign: TextAlign.right,),
             SizedBox(
               height:192,
               width: 227,
               child: ClipRRect(
                 borderRadius: BorderRadius.only(topRight: Radius.circular(10), topLeft:Radius.circular(10), bottomLeft: Radius.circular(10)),
-                child: messageImage != null ? Image.file(File(messageImage!.path), fit: BoxFit.cover) : Image.network('https://i.ebayimg.com/images/g/RgsAAOSwtqFk1su0/s-l1200.jpg', fit: BoxFit.cover)
+                child: attachmentUrl != null ? Image.network(attachmentUrl!, fit: BoxFit.cover) : null
                 ),
             ),
             ]
@@ -84,13 +84,13 @@ class ChatBubble extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.end,
             children: [
-            Text("12:39PM", style: TextStyle(fontSize: 14, color: Colors.black), textAlign: TextAlign.right,),
+            Text(messageTime, style: TextStyle(fontSize: 14, color: Colors.black), textAlign: TextAlign.right,),
             SizedBox(
               height:192,
               width: 227,
               child: ClipRRect(
                 borderRadius: BorderRadius.only(topRight: Radius.circular(10), topLeft:Radius.circular(10), bottomRight: Radius.circular(10)),
-                child: messageImage != null ? Image.file(File(messageImage!.path), fit: BoxFit.cover) : Image.network('https://i.ebayimg.com/images/g/RgsAAOSwtqFk1su0/s-l1200.jpg', fit: BoxFit.cover)),
+                child: attachmentUrl != null ? Image.network(attachmentUrl!, fit: BoxFit.cover) : null,)
             ),
             ]
           ),
