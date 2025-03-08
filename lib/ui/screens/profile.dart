@@ -77,7 +77,8 @@ class _ProfileState extends State<Profile> {
                 Center(
                   child: CircleAvatar(
                     radius: 80,
-                    backgroundImage: userData['profileImage'] != null
+                    backgroundImage: userData['profileImage'] != null &&
+                            Uri.parse(userData['profileImage']).isAbsolute
                         ? NetworkImage(userData['profileImage'])
                         : const AssetImage("assets/images/user.jpeg")
                             as ImageProvider,

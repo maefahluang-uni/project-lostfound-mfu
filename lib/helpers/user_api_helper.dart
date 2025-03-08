@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:io';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:http/http.dart' as http;
 import 'package:lost_found_mfu/main.dart';
@@ -7,7 +8,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 
 class UserApiHelper {
-  static final String? baseUrl = 'http://10.0.2.2:3001/api';
+  static final String? baseUrl = 'http://localhost:3001/api';
   final GoogleSignIn _googleSignIn = GoogleSignIn(
     scopes: <String>['email'],
   );
@@ -64,13 +65,29 @@ class UserApiHelper {
   static Future<Map<String, dynamic>> signIn(
       String email, String password) async {
     final url = Uri.parse('$baseUrl/users/signin');
-    String? fcmToken = await FirebaseMessaging.instance.getToken();
+
+    String? fcmToken;
+    if (Platform.isAndroid) {
+      fcmToken = await FirebaseMessaging.instance.getToken();
+      print("FCM Token (Android): $fcmToken");
+    } else {
+      print("Skipping FCM Token request on iOS.");
+    }
+
+    Map<String, dynamic> requestBody = {
+      "email": email,
+      "password": password,
+    };
+
+    if (fcmToken != null && fcmToken.isNotEmpty) {
+      requestBody["fcmToken"] = fcmToken;
+    }
 
     try {
       final response = await http.post(
         url,
         headers: _headers(),
-        body: jsonEncode({"email": email, "password": password, "fcmToken":fcmToken }),
+        body: jsonEncode(requestBody),
       );
 
       final data = jsonDecode(response.body);
@@ -172,30 +189,62 @@ class UserApiHelper {
   }
 
   // Update User Data
-  static Future<Map<String, dynamic>> updateUserProfile(
-    String name,
-    String bio,
-    String profileImageUrl,
-  ) async {
+  static Future<Map<String, dynamic>> updateUserProfile({
+    required String name,
+    required String bio,
+    required String profileImageUrl,
+    required String imagePath, // This is optional for image update
+  }) async {
     String? token = await getToken();
     String? userId = await getUserId();
 
     try {
       final url = Uri.parse('$baseUrl/users/user/$userId');
-      final response = await http.put(url,
-          headers: _headers(token: token),
-          body: json.encode({
-            'fullName': name,
-            'bio': bio,
-            'profileImage': profileImageUrl,
-          }));
+      final Map<String, String> headers = _headers(token: token);
 
-      if (response.statusCode == 200) {
-        print(response.body);
-        return json.decode(response.body);
+      if (imagePath.isNotEmpty) {
+        var request = http.MultipartRequest('PUT', url);
+        request.headers.addAll(headers);
+
+        request.fields['fullName'] = name;
+        request.fields['bio'] = bio;
+
+        var imageFile = await http.MultipartFile.fromPath(
+          'profileImage', // Field name expected by the API
+          imagePath,
+        );
+        request.files.add(imageFile);
+
+        var response = await request.send();
+        if (response.statusCode == 201) {
+          print("Profile updated successfully");
+          return json.decode(await response.stream.bytesToString());
+        } else {
+          print('Failed to update profile: ${response.statusCode}');
+          return {};
+        }
       } else {
-        print('Failed to update profile: ${response.statusCode}');
-        return {};
+        var body = {
+          'fullName': name,
+          'bio': bio,
+        };
+
+        if (profileImageUrl.startsWith('http://') ||
+            profileImageUrl.startsWith('https://')) {
+          body['profileImage'] =
+              profileImageUrl; // Send the URL directly if it's a remote image
+        }
+
+        final response =
+            await http.put(url, headers: headers, body: json.encode(body));
+
+        if (response.statusCode == 200) {
+          print("Profile updated successfully");
+          return json.decode(response.body);
+        } else {
+          print('Failed to update profile: ${response.statusCode}');
+          return {};
+        }
       }
     } catch (e) {
       print("Error fetching profile data: $e");
@@ -233,14 +282,14 @@ class UserApiHelper {
       final GoogleSignInAuthentication googleAuth =
           await googleUser.authentication;
       final idToken = googleAuth.idToken;
-    String? fcmToken = await FirebaseMessaging.instance.getToken();
+      String? fcmToken = await FirebaseMessaging.instance.getToken();
 
       if (idToken == null) throw Exception("Failed to get idToken");
 
       final url = Uri.parse("$baseUrl/users/google-signin");
       final response = await http.post(
         url,
-        body: jsonEncode({"idToken": idToken,"fcmToken": fcmToken}),
+        body: jsonEncode({"idToken": idToken, "fcmToken": fcmToken}),
       );
 
       if (response.statusCode == 200) {
@@ -268,8 +317,9 @@ class UserApiHelper {
     }
   }
 
-  static Future<void> forceLogout () async { 
+  static Future<void> forceLogout() async {
     await logout();
-    navigatorKey.currentState?.pushNamedAndRemoveUntil('/login', (route) => false);
+    navigatorKey.currentState
+        ?.pushNamedAndRemoveUntil('/login', (route) => false);
   }
 }

@@ -54,22 +54,30 @@ class _EditProfileState extends State<EditProfile> {
     final name = _editUsernameController.text.trim();
     final bio = _editBioController.text.trim();
 
-    // Convert _imageFile to Base64 or Upload it to the server
-    String? updatedProfileImage =
-        _imageFile != null ? _imageFile!.path : profileImageUrl;
-    print('$name, $bio, $updatedProfileImage');
-    final response =
-        await UserApiHelper.updateUserProfile(name, bio, updatedProfileImage);
+    String imagePath = _imageFile?.path ?? '';
 
-    if (response.isNotEmpty) {
+    final result = await UserApiHelper.updateUserProfile(
+      name: name,
+      bio: bio,
+      profileImageUrl: profileImageUrl, // existing profile image URL
+      imagePath: imagePath,
+    );
+
+    if (result.isNotEmpty) {
+      // Successfully updated the profile
       ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Profile updated successfully')));
-      await _loadUserProfile();
+        const SnackBar(content: Text('Profile updated successfully')),
+      );
+      await _loadUserProfile(); // Reload the profile
       Navigator.pushReplacement(
-          context, MaterialPageRoute(builder: (context) => const Home()));
+        context,
+        MaterialPageRoute(builder: (context) => const Home()),
+      );
     } else {
+      // Failed to update the profile
       ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Failed to update profile')));
+        const SnackBar(content: Text('Failed to update profile')),
+      );
     }
   }
 
@@ -89,7 +97,11 @@ class _EditProfileState extends State<EditProfile> {
                         radius: 80,
                         backgroundImage: _imageFile != null
                             ? FileImage(_imageFile!)
-                            : NetworkImage(profileImageUrl) as ImageProvider,
+                            : profileImageUrl.startsWith('http') ||
+                                    profileImageUrl.startsWith('https')
+                                ? NetworkImage(profileImageUrl) // Network image
+                                : AssetImage('assets/images/user.jpeg')
+                                    as ImageProvider,
                       ),
                       const SizedBox(height: 20),
                       ElevatedButton.icon(

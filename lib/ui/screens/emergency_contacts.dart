@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:lost_found_mfu/components/common/custom_appbar.dart';
+import 'package:url_launcher/url_launcher.dart'; // Import the package
 
 class EmergencyContacts extends StatefulWidget {
   const EmergencyContacts({super.key});
@@ -60,9 +61,13 @@ class EmergencyContactCard extends StatelessWidget {
     required this.phone,
   });
 
-  void _makeCall(String phoneNumber) {
-    // You can integrate phone call functionality using url_launcher here
-    print('Calling $phoneNumber');
+  void _makeCall(String phoneNumber) async {
+    final Uri phoneUri = Uri(scheme: 'tel', path: phoneNumber);
+    if (await canLaunchUrl(phoneUri)) {
+      await launchUrl(phoneUri);
+    } else {
+      throw 'Could not launch $phoneNumber';
+    }
   }
 
   @override

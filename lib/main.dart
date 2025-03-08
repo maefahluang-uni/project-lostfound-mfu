@@ -21,19 +21,27 @@ void main() async {
   String initialRoute = await getInitialRoute();
 
   await Firebase.initializeApp();
+
+  // if (Platform.isAndroid) {
   FirebaseMessaging messaging = FirebaseMessaging.instance;
   NotificationSettings settings = await messaging.requestPermission(
     alert: true,
     badge: true,
     sound: true,
   );
+
   if (settings.authorizationStatus == AuthorizationStatus.authorized) {
     print("User granted permission for notifications.");
   } else {
     print("User denied permission.");
   }
+  // } else {
+  //   print("Skipping Firebase Messaging on iOS (No Apple Developer Account).");
+  // }
+
   runApp(MyApp(initialRoute: initialRoute));
 }
+
 final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 
 Future<String> getInitialRoute() async {
