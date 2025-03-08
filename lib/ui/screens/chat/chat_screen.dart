@@ -60,7 +60,7 @@ class _ChatScreenState extends State<ChatScreen> {
   void _onSearchChanged() {
     if (_debounce?.isActive ?? false) _debounce?.cancel();
     _debounce = Timer(const Duration(milliseconds: 500), () {
-      fetchChatRooms(searchQuery: _chatsSearchController.text.trim());
+      fetchChatRooms(searchQuery: _chatsSearchController.text.trim(), loadingRequired: true);
     });
   }
   Future<void> joinAllChatRooms(List<ChatRoom> chatRooms, SocketService socketService) async{
