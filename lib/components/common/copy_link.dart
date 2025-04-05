@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart'; // Import for Clipboard functionality
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 class CopyLink extends StatefulWidget {
   final String postId;
@@ -12,7 +13,7 @@ class CopyLink extends StatefulWidget {
 
 class _CopyLinkState extends State<CopyLink> {
   bool isCopied = false;
-  static final String? baseUrl = 'http://localhost:3001/api';
+  static final String? baseUrl = dotenv.env['BASE_URL'];
 
   void _copyLink() {
     String postUrl = "https://lost-and-found-in-mfu-service.web.app";

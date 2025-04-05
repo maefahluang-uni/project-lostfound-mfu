@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:lost_found_mfu/helpers/user_api_helper.dart';
 import 'package:lost_found_mfu/models/chat.dart';
@@ -10,7 +11,7 @@ import 'package:mime/mime.dart';
 import 'package:http_parser/http_parser.dart';
 
 class ChatApiHelper {
-  static final String? baseUrl = "http://localhost:3001/api";
+  static final String? baseUrl = dotenv.env['BASE_URL'];
 
   static Future<String?> getToken() async {
     final prefs = await SharedPreferences.getInstance();

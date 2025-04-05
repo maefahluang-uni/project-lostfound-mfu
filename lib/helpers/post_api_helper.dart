@@ -1,13 +1,14 @@
 import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/services.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:lost_found_mfu/helpers/user_api_helper.dart';
 import 'package:path/path.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
 
 class PostApiHelper {
-  static final String? baseUrl = 'http://localhost:3001/api';
+    static final String? baseUrl = dotenv.env['BASE_URL'];
 
   // Get token from shared preferences
   static Future<String?> getToken() async {
