@@ -1,4 +1,5 @@
 import 'package:socket_io_client/socket_io_client.dart' as IO;
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 class SocketService {
   static final SocketService _instance = SocketService._internal();
@@ -7,11 +8,12 @@ class SocketService {
   factory SocketService() {
     return _instance;
   }
+  static final String? socketUrl = dotenv.env['SOCKET_URL'];
 
   SocketService._internal();
 
   Future<void> initSocket() async {
-    _socket = IO.io("ws://10.0.2.2:3001", <String, dynamic>{
+    _socket = IO.io(socketUrl, <String, dynamic>{
       'transports': ['websocket'],
       'autoConnect': false,
       'reconnection': true,
